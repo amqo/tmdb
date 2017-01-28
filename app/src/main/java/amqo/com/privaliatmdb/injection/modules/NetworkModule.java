@@ -1,14 +1,8 @@
-package amqo.com.privaliatmdb.infrastructure.injection.modules;
-
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-
-import javax.inject.Singleton;
+package amqo.com.privaliatmdb.injection.modules;
 
 import amqo.com.privaliatmdb.ParentApplication;
-import amqo.com.privaliatmdb.network.IMoviesController;
-import amqo.com.privaliatmdb.network.TMDBController;
-import amqo.com.privaliatmdb.network.TMDBEndpointInterface;
+import amqo.com.privaliatmdb.injection.scopes.PerActivity;
+import amqo.com.privaliatmdb.network.IMoviesEndpoint;
 import dagger.Module;
 import dagger.Provides;
 import okhttp3.Cache;
@@ -17,19 +11,9 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 @Module
-public class TMDBModule {
+public class NetworkModule {
 
-    @Provides @Singleton
-    IMoviesController providesMoviesController(ParentApplication application) {
-        return new TMDBController(application);
-    }
-
-    @Provides @Singleton
-    SharedPreferences providesSharedPreferences(ParentApplication application) {
-        return PreferenceManager.getDefaultSharedPreferences(application);
-    }
-
-    @Provides @Singleton
+    @Provides @PerActivity
     Cache providesOkHttpCache(ParentApplication application) {
         int cacheSize = 10 * 1024 * 1024; // 10 MiB
         Cache cache = new Cache(application.getCacheDir(), cacheSize);
@@ -37,7 +21,7 @@ public class TMDBModule {
     }
 
 
-    @Provides @Singleton
+    @Provides @PerActivity
     OkHttpClient providesOkHttpClient(Cache cache) {
         OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
         clientBuilder.cache(cache);
@@ -45,16 +29,20 @@ public class TMDBModule {
         return client;
     }
 
-    @Provides @Singleton
+    @Provides @PerActivity
     Retrofit providesRetrofit(OkHttpClient okHttpClient) {
 
         Retrofit retrofit = new Retrofit.Builder()
                 .client(okHttpClient)
-                .baseUrl(TMDBEndpointInterface.BASE_API_URL)
+                .baseUrl(IMoviesEndpoint.BASE_API_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
         return retrofit;
     }
 
+    @Provides @PerActivity
+    IMoviesEndpoint providesMoviesEndpoint(Retrofit retrofit) {
+        return retrofit.create(IMoviesEndpoint.class);
+    }
 }

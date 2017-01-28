@@ -1,4 +1,4 @@
-package amqo.com.privaliatmdb.infrastructure.injection.modules;
+package amqo.com.privaliatmdb.injection.modules;
 
 import javax.inject.Singleton;
 
@@ -7,11 +7,11 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-public class AppModule {
+public class ApplicationModule {
 
     ParentApplication mApplication;
 
-    public AppModule(ParentApplication application) {
+    public ApplicationModule(ParentApplication application) {
         mApplication = application;
     }
 

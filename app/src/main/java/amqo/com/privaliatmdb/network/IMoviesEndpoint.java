@@ -8,13 +8,14 @@ import retrofit2.http.GET;
 import retrofit2.http.Path;
 import retrofit2.http.QueryMap;
 
-public interface TMDBEndpointInterface {
+public interface IMoviesEndpoint {
 
     String BASE_API_URL = "https://api.themoviedb.org/";
 
-    // https://api.themoviedb.org/3/movie/popular?language=es-ES&page=1&sort_by=popularity.desc&api_key=XXXX
+    int API_VERSION = 3;
+
     @GET("{version}/movie/popular/")
-    Call<Movies> getPopularMovies(
+    Call<Movies> getMovies(
             @Path("version") int versionCode,
             @QueryMap Map<String, String> parameters);
 }

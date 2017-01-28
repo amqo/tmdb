@@ -2,16 +2,19 @@ package amqo.com.privaliatmdb;
 
 import android.app.Application;
 
-import amqo.com.privaliatmdb.infrastructure.injection.DaggerParentComponent;
-import amqo.com.privaliatmdb.infrastructure.injection.ParentComponent;
-import amqo.com.privaliatmdb.infrastructure.injection.modules.AppModule;
-import amqo.com.privaliatmdb.infrastructure.injection.modules.TMDBModule;
+import amqo.com.privaliatmdb.injection.ApplicationComponent;
+import amqo.com.privaliatmdb.injection.DaggerApplicationComponent;
+import amqo.com.privaliatmdb.injection.MainActivityComponent;
+import amqo.com.privaliatmdb.injection.modules.ApplicationModule;
+import amqo.com.privaliatmdb.injection.modules.MainActivityModule;
 
 public class ParentApplication extends Application {
 
     private static ParentApplication INSTANCE;
 
-    private ParentComponent mParentComponent;
+    private ApplicationComponent mApplicationComponent;
+
+    private MainActivityComponent mMainActivityComponent;
 
     public static ParentApplication getInstance() {
         return INSTANCE;
@@ -23,13 +26,18 @@ public class ParentApplication extends Application {
 
         INSTANCE = this;
 
-        mParentComponent = DaggerParentComponent.builder()
-                .appModule(new AppModule(this))
-                .tMDBModule(new TMDBModule())
+        mApplicationComponent = DaggerApplicationComponent.builder()
+                .applicationModule(new ApplicationModule(this))
                 .build();
     }
 
-    public ParentComponent getParentComponent() {
-        return mParentComponent;
+    public MainActivityComponent getMainActivityComponent(MainActivity activity) {
+        mMainActivityComponent = mApplicationComponent.getMainActivityComponent(
+                new MainActivityModule(activity));
+        return mMainActivityComponent;
+    }
+
+    public void releaseMainActivityComponent() {
+        mMainActivityComponent = null;
     }
 }

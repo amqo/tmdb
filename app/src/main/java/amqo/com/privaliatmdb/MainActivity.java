@@ -17,6 +17,7 @@ import javax.inject.Inject;
 import amqo.com.privaliatmdb.model.Movie;
 import amqo.com.privaliatmdb.model.Movies;
 import amqo.com.privaliatmdb.network.IMoviesController;
+import amqo.com.privaliatmdb.network.IMoviesController.IMoviesListener;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -38,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        ParentApplication.getInstance().getParentComponent().inject(this);
+        ParentApplication.getInstance().getMainActivityComponent(this).inject(this);
 
         mUnbinder = ButterKnife.bind(this);
 
@@ -49,14 +50,15 @@ public class MainActivity extends AppCompatActivity {
                 Snackbar.make(view, "Receiving popular movies in page " + page, Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
 
-                mMoviesController.getMovies(page, new IMoviesController.IMoviesListener() {
-                    @Override
-                    public void onMoviesLoaded(Movies movies) {
-                        List<Movie> resultMovies = movies.getMovies();
-                        for (Movie movie : resultMovies) {
-                            Log.i("", "");
-                        }
-                    }
+                mMoviesController.getMovies(page,
+                        new IMoviesListener() {
+                            @Override
+                            public void onMoviesLoaded(Movies movies) {
+                                List<Movie> resultMovies = movies.getMovies();
+                                for (Movie movie : resultMovies) {
+                                    Log.i("", "");
+                                }
+                            }
                 });
             }
         });
@@ -66,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         mUnbinder.unbind();
+        ParentApplication.getInstance().releaseMainActivityComponent();
     }
 
     @Override
