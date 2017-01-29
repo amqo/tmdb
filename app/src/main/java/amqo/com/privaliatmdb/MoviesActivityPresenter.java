@@ -1,61 +1,39 @@
 package amqo.com.privaliatmdb;
 
-import android.util.Log;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.inject.Inject;
 
 import amqo.com.privaliatmdb.model.Movies;
 import amqo.com.privaliatmdb.network.IMoviesController;
-import amqo.com.privaliatmdb.network.IMoviesEndpoint;
+import amqo.com.privaliatmdb.network.MoviesEndpoint;
 import amqo.com.privaliatmdb.network.MovieParameterCreator;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
-public class MoviesActivityPresenter implements IMoviesController, Callback<Movies> {
+public class MoviesActivityPresenter implements IMoviesController {
 
-    private IMoviesEndpoint mMoviesEndpoint;
+    private MoviesEndpoint mMoviesEndpoint;
     private MovieParameterCreator mMovieParameterCreator;
-
-    private List<IMoviesListener> mListeners;
 
     @Inject
     public MoviesActivityPresenter(
             MovieParameterCreator movieParameterCreator,
-            IMoviesEndpoint moviesEndpoint) {
+            MoviesEndpoint moviesEndpoint) {
 
         mMoviesEndpoint = moviesEndpoint;
         mMovieParameterCreator = movieParameterCreator;
-        mListeners = new ArrayList<>();
     }
 
     @Override
-    public void getMovies(int page, IMoviesListener listener) {
-        addListener(listener);
+    public void getMovies(int page, Consumer<Movies> consumer) {
 
-        Call<Movies> call = mMoviesEndpoint.getMovies(
-                IMoviesEndpoint.API_VERSION, mMovieParameterCreator.createParameters(page));
-        call.enqueue(this);
-    }
+        Observable<Movies> moviesObservable = mMoviesEndpoint.getMovies(
+                MoviesEndpoint.API_VERSION, mMovieParameterCreator.createParameters(page));
 
-    @Override
-    public void onResponse(Call<Movies> call, Response<Movies> response) {
-        Movies movies = response.body();
-        for (IMoviesListener listener : mListeners)
-            listener.onMoviesLoaded(movies);
-        mListeners.clear();
-    }
-
-    @Override
-    public void onFailure(Call<Movies> call, Throwable t) {
-        Log.e("", t.getMessage());
-    }
-
-    private void addListener(IMoviesListener listener) {
-        if (mListeners.contains(listener)) return;
-        mListeners.add(listener);
+        moviesObservable
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(consumer);
     }
 }

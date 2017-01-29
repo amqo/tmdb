@@ -8,15 +8,15 @@ import amqo.com.privaliatmdb.injection.MainActivityComponent;
 import amqo.com.privaliatmdb.injection.modules.ApplicationModule;
 import amqo.com.privaliatmdb.injection.modules.MainActivityModule;
 
-public class ParentApplication extends Application {
+public class MoviesApplication extends Application {
 
-    private static ParentApplication INSTANCE;
+    private static MoviesApplication INSTANCE;
 
     private ApplicationComponent mApplicationComponent;
 
     private MainActivityComponent mMainActivityComponent;
 
-    public static ParentApplication getInstance() {
+    public static MoviesApplication getInstance() {
         return INSTANCE;
     }
 
@@ -31,9 +31,12 @@ public class ParentApplication extends Application {
                 .build();
     }
 
-    public MainActivityComponent getMainActivityComponent(MainActivity activity) {
+    public void createMainActivityComponent(MainActivity activity) {
         mMainActivityComponent = mApplicationComponent.getMainActivityComponent(
                 new MainActivityModule(activity));
+    }
+
+    public MainActivityComponent getMainActivityComponent() {
         return mMainActivityComponent;
     }
 

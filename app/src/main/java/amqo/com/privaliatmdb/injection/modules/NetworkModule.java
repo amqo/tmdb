@@ -1,8 +1,12 @@
 package amqo.com.privaliatmdb.injection.modules;
 
-import amqo.com.privaliatmdb.ParentApplication;
-import amqo.com.privaliatmdb.injection.scopes.PerActivity;
-import amqo.com.privaliatmdb.network.IMoviesEndpoint;
+import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+
+import amqo.com.privaliatmdb.MoviesApplication;
+import amqo.com.privaliatmdb.injection.scopes.PerFragment;
+import amqo.com.privaliatmdb.network.MovieParameterCreator;
+import amqo.com.privaliatmdb.network.MoviesEndpoint;
+import amqo.com.privaliatmdb.network.PopularMoviesParametersCreator;
 import dagger.Module;
 import dagger.Provides;
 import okhttp3.Cache;
@@ -13,15 +17,15 @@ import retrofit2.converter.gson.GsonConverterFactory;
 @Module
 public class NetworkModule {
 
-    @Provides @PerActivity
-    Cache providesOkHttpCache(ParentApplication application) {
+    @Provides @PerFragment
+    Cache providesOkHttpCache(MoviesApplication application) {
         int cacheSize = 10 * 1024 * 1024; // 10 MiB
         Cache cache = new Cache(application.getCacheDir(), cacheSize);
         return cache;
     }
 
 
-    @Provides @PerActivity
+    @Provides @PerFragment
     OkHttpClient providesOkHttpClient(Cache cache) {
         OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
         clientBuilder.cache(cache);
@@ -29,20 +33,33 @@ public class NetworkModule {
         return client;
     }
 
-    @Provides @PerActivity
+    @Provides @PerFragment
     Retrofit providesRetrofit(OkHttpClient okHttpClient) {
 
         Retrofit retrofit = new Retrofit.Builder()
                 .client(okHttpClient)
-                .baseUrl(IMoviesEndpoint.BASE_API_URL)
+                .baseUrl(MoviesEndpoint.BASE_API_URL)
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
         return retrofit;
     }
 
-    @Provides @PerActivity
-    IMoviesEndpoint providesMoviesEndpoint(Retrofit retrofit) {
-        return retrofit.create(IMoviesEndpoint.class);
+    @Provides @PerFragment
+    MoviesEndpoint providesMoviesEndpoint(Retrofit retrofit) {
+        return retrofit.create(MoviesEndpoint.class);
     }
+
+    @Provides @PerFragment
+    MovieParameterCreator providesMovieParameterCreator() {
+        return new PopularMoviesParametersCreator();
+    }
+
+//    @Provides @PerFragment
+//    IMoviesController providesMoviesController(
+//            MovieParameterCreator movieParameterCreator,
+//            MoviesEndpoint moviesEndpoint) {
+//        return new MoviesActivityPresenter(movieParameterCreator, moviesEndpoint);
+//    }
 }

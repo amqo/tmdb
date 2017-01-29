@@ -11,11 +11,11 @@ import org.mockito.stubbing.Answer;
 import java.util.Map;
 
 import amqo.com.privaliatmdb.model.Movies;
-import amqo.com.privaliatmdb.network.IMoviesController.IMoviesListener;
-import amqo.com.privaliatmdb.network.IMoviesEndpoint;
+import amqo.com.privaliatmdb.network.MoviesEndpoint;
 import amqo.com.privaliatmdb.network.MovieParameterCreator;
 import amqo.com.privaliatmdb.network.PopularMoviesParametersCreator;
-import retrofit2.Call;
+import io.reactivex.Observable;
+import io.reactivex.functions.Consumer;
 
 import static junit.framework.Assert.assertEquals;
 import static org.mockito.Matchers.any;
@@ -25,15 +25,18 @@ import static org.mockito.Mockito.verify;
 @RunWith(MockitoJUnitRunner.class)
 public class MoviesActivityPresenterTest {
 
-    private MoviesActivityPresenter mMoviesActivityPresenter;
+    @Mock
+    private MoviesEndpoint mMoviesEndpointInterfaceMock;
 
     @Mock
-    private IMoviesEndpoint mMoviesEndpointInterface;
+    private Observable<Movies> mObservableMoviesMock;
 
     @Mock
-    private Call<Movies> mCallMovies;
+    private MovieParameterCreator mMovieParameterCreatorMock;
 
     private MovieParameterCreator mMovieParameterCreator;
+
+    private MoviesActivityPresenter mMoviesActivityPresenter;
 
     private final int DEFAULT_PAGE = 1;
 
@@ -41,76 +44,74 @@ public class MoviesActivityPresenterTest {
     public void setUp() {
         mMovieParameterCreator = new PopularMoviesParametersCreator();
         mMoviesActivityPresenter = new MoviesActivityPresenter(
-                mMovieParameterCreator, mMoviesEndpointInterface);
+                mMovieParameterCreator, mMoviesEndpointInterfaceMock);
     }
 
     @Test
-    public void verifyMovieCalls() {
+    public void getMovies_callCorrectMethods() {
 
-        doAnswer(
-                new Answer() {
-                    @Override
-                    public Object answer(InvocationOnMock invocation) throws Throwable {
-                        return mCallMovies;
-                    }
-                }
-        ).when(mMoviesEndpointInterface).getMovies(any(Integer.class), any(Map.class));
+        mMoviesActivityPresenter = new MoviesActivityPresenter(
+                mMovieParameterCreatorMock, mMoviesEndpointInterfaceMock);
 
-        mMoviesActivityPresenter.getMovies(DEFAULT_PAGE, new IMoviesListener() {
+        Consumer<Movies> consumer = new Consumer<Movies>() {
             @Override
-            public void onMoviesLoaded(Movies movies) {}
-        });
+            public void accept(Movies movies) throws Exception { }
+        };
 
-        verify(mCallMovies).enqueue(mMoviesActivityPresenter);
-        verify(mMoviesEndpointInterface).getMovies(any(Integer.class), any(Map.class));
-
-
-    }
-
-    @Test
-    public void verifyMovieCallParameters() {
-
-        doAnswer(
-                new Answer() {
-                    @Override
-                    public Object answer(InvocationOnMock invocation) throws Throwable {
-
-                        assertEquals(invocation.getArguments()[0], IMoviesEndpoint.API_VERSION);
-
-                        Map<String, String> parameters = (Map<String, String>) invocation.getArguments()[1];
-                        assertEquals(parameters.size(), 4);
-                        assertEquals(parameters.get("page"), Integer.toString(DEFAULT_PAGE));
-                        assertEquals(parameters.get("sort_by"), "popularity.desc");
-
-                        return mCallMovies;
-                    }
-                }
-        ).when(mMoviesEndpointInterface).getMovies(any(Integer.class), any(Map.class));
-        mMoviesActivityPresenter.getMovies(DEFAULT_PAGE, new IMoviesListener() {
+        doAnswer(new Answer() {
             @Override
-            public void onMoviesLoaded(Movies movies) { }
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+                return mObservableMoviesMock;
+            }
+        }).when(mMoviesEndpointInterfaceMock).getMovies(any(Integer.class), any(Map.class));
+        mMoviesActivityPresenter.getMovies(DEFAULT_PAGE, consumer);
+
+        verify(mMoviesEndpointInterfaceMock).getMovies(any(Integer.class), any(Map.class));
+        verify(mMovieParameterCreatorMock).createParameters(DEFAULT_PAGE);
+    }
+
+    @Test
+    public void getMovies_UsesCorrectParameters() {
+
+        doAnswer(new Answer() {
+                     @Override
+                     public Object answer(InvocationOnMock invocation) throws Throwable {
+
+                         assertEquals(invocation.getArguments()[0], MoviesEndpoint.API_VERSION);
+
+                         Map<String, String> parameters = (Map<String, String>) invocation.getArguments()[1];
+                         assertEquals(parameters.size(), 4);
+                         assertEquals(parameters.get("page"), Integer.toString(DEFAULT_PAGE));
+                         assertEquals(parameters.get("sort_by"), "popularity.desc");
+
+                         return mObservableMoviesMock;
+                     }
+                 }
+        ).when(mMoviesEndpointInterfaceMock).getMovies(any(Integer.class), any(Map.class));
+        mMoviesActivityPresenter.getMovies(DEFAULT_PAGE, new Consumer<Movies>() {
+            @Override
+            public void accept(Movies movies) throws Exception { }
         });
     }
 
     @Test
-    public void verifyMovieCallPagination() {
+    public void getMovies_CreatesCorrectPagination() {
 
         final int secondPage = 2;
 
-        doAnswer(
-                new Answer() {
-                    @Override
-                    public Object answer(InvocationOnMock invocation) throws Throwable {
+        doAnswer(new Answer() {
+                     @Override
+                     public Object answer(InvocationOnMock invocation) throws Throwable {
 
-                        Map<String, String> parameters = (Map<String, String>) invocation.getArguments()[1];
-                        assertEquals(parameters.get("page"), Integer.toString(secondPage));
-                        return mCallMovies;
-                    }
-                }
-        ).when(mMoviesEndpointInterface).getMovies(any(Integer.class), any(Map.class));
-        mMoviesActivityPresenter.getMovies(secondPage, new IMoviesListener() {
+                         Map<String, String> parameters = (Map<String, String>) invocation.getArguments()[1];
+                         assertEquals(parameters.get("page"), Integer.toString(secondPage));
+                         return mObservableMoviesMock;
+                     }
+                 }
+        ).when(mMoviesEndpointInterfaceMock).getMovies(any(Integer.class), any(Map.class));
+        mMoviesActivityPresenter.getMovies(secondPage, new Consumer<Movies>() {
             @Override
-            public void onMoviesLoaded(Movies movies) { }
+            public void accept(Movies movies) throws Exception { }
         });
     }
 

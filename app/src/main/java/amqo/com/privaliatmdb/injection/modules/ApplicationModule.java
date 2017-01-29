@@ -2,21 +2,21 @@ package amqo.com.privaliatmdb.injection.modules;
 
 import javax.inject.Singleton;
 
-import amqo.com.privaliatmdb.ParentApplication;
+import amqo.com.privaliatmdb.MoviesApplication;
 import dagger.Module;
 import dagger.Provides;
 
 @Module
 public class ApplicationModule {
 
-    ParentApplication mApplication;
+    MoviesApplication mApplication;
 
-    public ApplicationModule(ParentApplication application) {
+    public ApplicationModule(MoviesApplication application) {
         mApplication = application;
     }
 
     @Provides @Singleton
-    ParentApplication providesApplication() {
+    MoviesApplication providesApplication() {
         return mApplication;
     }
 }

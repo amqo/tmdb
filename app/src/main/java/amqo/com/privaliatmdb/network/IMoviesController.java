@@ -1,12 +1,9 @@
 package amqo.com.privaliatmdb.network;
 
 import amqo.com.privaliatmdb.model.Movies;
+import io.reactivex.functions.Consumer;
 
 public interface IMoviesController {
 
-    interface IMoviesListener {
-        void onMoviesLoaded(Movies movies);
-    }
-
-    void getMovies(int page, IMoviesListener listener);
+    void getMovies(int page, Consumer<Movies> consumer);
 }
