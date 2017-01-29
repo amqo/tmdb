@@ -55,11 +55,4 @@ public class NetworkModule {
     MovieParameterCreator providesMovieParameterCreator() {
         return new PopularMoviesParametersCreator();
     }
-
-//    @Provides @PerFragment
-//    IMoviesController providesMoviesController(
-//            MovieParameterCreator movieParameterCreator,
-//            MoviesEndpoint moviesEndpoint) {
-//        return new MoviesActivityPresenter(movieParameterCreator, moviesEndpoint);
-//    }
 }

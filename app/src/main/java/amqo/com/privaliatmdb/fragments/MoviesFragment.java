@@ -27,13 +27,12 @@ public class MoviesFragment extends Fragment {
     @Inject
     MoviesActivityPresenter mMoviesController;
 
-//    private MoviesScrollListener mScrollListener;
     private RecyclerView mRecyclerView;
     private MoviesRecyclerViewAdapter mMoviesRecyclerViewAdapter;
+    private boolean mIsLoading = false;
 
     private int mColumnCount = 1;
     private OnMoviesInteractionListener mListener;
-
 
     public MoviesFragment() {
     }
@@ -49,7 +48,7 @@ public class MoviesFragment extends Fragment {
 
             mRecyclerView = (RecyclerView) view;
 
-            RecyclerView.LayoutManager layoutManager;
+            final RecyclerView.LayoutManager layoutManager;
             if (mColumnCount <= 1) {
                 layoutManager = new LinearLayoutManager(context);
                 mRecyclerView.setLayoutManager(layoutManager);
@@ -58,7 +57,30 @@ public class MoviesFragment extends Fragment {
                 mRecyclerView.setLayoutManager(layoutManager);
             }
 
-            mRecyclerView.setNestedScrollingEnabled(false);
+            RecyclerView.OnScrollListener mScrollListener = new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+                    if (mIsLoading)
+                        return;
+                    int visibleItemCount = layoutManager.getChildCount();
+                    int totalItemCount = layoutManager.getItemCount();
+
+                    int pastVisibleItems = 0;
+                    if (layoutManager instanceof LinearLayoutManager)
+                        pastVisibleItems = ((LinearLayoutManager)layoutManager)
+                                .findFirstVisibleItemPosition();
+                    if (layoutManager instanceof GridLayoutManager)
+                        pastVisibleItems = ((GridLayoutManager)layoutManager)
+                                .findFirstVisibleItemPosition();
+
+                    if (pastVisibleItems + visibleItemCount >= totalItemCount - 2) {
+                        mMoviesRecyclerViewAdapter.getMoreMovies();
+                        mIsLoading = true;
+                    }
+                }
+            };
+            mRecyclerView.addOnScrollListener(mScrollListener);
         }
         return view;
     }
@@ -71,11 +93,15 @@ public class MoviesFragment extends Fragment {
 
         mMoviesRecyclerViewAdapter = new MoviesRecyclerViewAdapter(new ArrayList<Movie>(), mListener,
                 new MoviesRecyclerViewAdapter.OnConsumeMoviesListener() {
-            @Override
-            public void getMovies(int page, Consumer<Movies> consumer) {
-                mMoviesController.getMovies(page, consumer);
-            }
-        });
+                    @Override
+                    public void getMovies(int page, Consumer<Movies> consumer) {
+                        mMoviesController.getMovies(page, consumer);
+                    }
+                    @Override
+                    public void onMoviesReceived() {
+                        mIsLoading = false;
+                    }
+                });
         mRecyclerView.setAdapter(mMoviesRecyclerViewAdapter);
     }
 

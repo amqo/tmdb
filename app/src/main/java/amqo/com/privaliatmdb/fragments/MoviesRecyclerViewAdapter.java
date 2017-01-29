@@ -28,10 +28,13 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecycl
     private final OnMoviesInteractionListener mListener;
     private final OnConsumeMoviesListener mConsumerListener;
 
+    private Movies mLastReceivedMovies;
+
     public MoviesRecyclerViewAdapter(
             List<Movie> items,
             OnMoviesInteractionListener listener,
             OnConsumeMoviesListener consumerListener) {
+
         mValues = items;
         mListener = listener;
         mConsumerListener = consumerListener;
@@ -39,6 +42,8 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecycl
         mMoviesConsumer = new Consumer<Movies>() {
             @Override
             public void accept(Movies movies) throws Exception {
+                mLastReceivedMovies = movies;
+                mConsumerListener.onMoviesReceived();
                 addMovies(movies.getMovies());
             }
         };
@@ -88,6 +93,11 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecycl
         notifyItemRangeInserted(previousSize, mValues.size());
     }
 
+    public void getMoreMovies() {
+        mConsumerListener.getMovies(
+                mLastReceivedMovies.getPage() + 1, mMoviesConsumer);
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         public final View mView;
@@ -118,5 +128,6 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecycl
 
     public interface OnConsumeMoviesListener {
         void getMovies(int page, Consumer<Movies> consumer);
+        void onMoviesReceived();
     }
 }
