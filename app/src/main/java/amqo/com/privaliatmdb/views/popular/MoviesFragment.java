@@ -1,9 +1,9 @@
 package amqo.com.privaliatmdb.views.popular;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -20,12 +20,18 @@ import amqo.com.privaliatmdb.MoviesApplication;
 import amqo.com.privaliatmdb.R;
 import amqo.com.privaliatmdb.model.Movie;
 import amqo.com.privaliatmdb.model.MoviesContract;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class MoviesFragment extends Fragment implements MoviesContract.View {
 
     @Inject MoviesContract.Presenter mMoviesPresenter;
 
-    private RecyclerView mRecyclerView;
+    @BindView(R.id.list_refresh)
+    SwipeRefreshLayout mSwipeRefreshLayout;
+    @BindView(R.id.list)
+    RecyclerView mRecyclerView;
+
     private MoviesRecyclerViewAdapter mMoviesRecyclerViewAdapter;
     private boolean mIsLoading = false;
 
@@ -39,25 +45,18 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_movies, container, false);
 
-        // Set the adapter
-        if (view instanceof RecyclerView) {
-            Context context = view.getContext();
+        ButterKnife.bind(this, view);
 
-            mRecyclerView = (RecyclerView) view;
+        initRecyclerView();
 
-            final RecyclerView.LayoutManager layoutManager;
-            if (mColumnCount <= 1) {
-                layoutManager = new LinearLayoutManager(context);
-                mRecyclerView.setLayoutManager(layoutManager);
-            } else {
-                layoutManager = new GridLayoutManager(context, mColumnCount);
-                mRecyclerView.setLayoutManager(layoutManager);
+        mSwipeRefreshLayout.setOnRefreshListener(
+                new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshMovies();
             }
+        });
 
-            RecyclerView.OnScrollListener mScrollListener =
-                    new MoviesScrollListener(layoutManager);
-            mRecyclerView.addOnScrollListener(mScrollListener);
-        }
         return view;
     }
 
@@ -74,6 +73,7 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
 
     @Override
     public void refreshMovies() {
+        setLoading(true);
         mMoviesRecyclerViewAdapter.refreshMovies();
     }
 
@@ -81,6 +81,12 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
     public void setLoading(boolean loading) {
         // TODO show or hide refresh layout
         mIsLoading = loading;
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mSwipeRefreshLayout.setRefreshing(mIsLoading);
+            }
+        });
     }
 
     @Override
@@ -95,6 +101,22 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
         DisplayMetrics metrics = new DisplayMetrics();
         display.getMetrics(metrics);
         return (int)metrics.xdpi;
+    }
+
+    private void initRecyclerView() {
+
+        final RecyclerView.LayoutManager layoutManager;
+        if (mColumnCount <= 1) {
+            layoutManager = new LinearLayoutManager(getContext());
+            mRecyclerView.setLayoutManager(layoutManager);
+        } else {
+            layoutManager = new GridLayoutManager(getContext(), mColumnCount);
+            mRecyclerView.setLayoutManager(layoutManager);
+        }
+
+        RecyclerView.OnScrollListener mScrollListener =
+                new MoviesScrollListener(layoutManager);
+        mRecyclerView.addOnScrollListener(mScrollListener);
     }
 
     private class MoviesScrollListener extends RecyclerView.OnScrollListener {
