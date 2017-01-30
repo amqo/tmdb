@@ -65,9 +65,8 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecycl
 
         holder.mItem = movie;
 
-        holder.mTitleView.setText(movie.getTitle());
+        holder.mTitleView.setText(movie.getTitleWithYear());
         holder.mOverView.setText(movie.getOverview());
-        holder.mYearView.setText(movie.getReleaseYear());
 
         Glide.with(MoviesApplication.getInstance()).load(movie.getPosterPath())
                 .centerCrop().crossFade().into(holder.mImageView);
@@ -106,8 +105,6 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecycl
         public ImageView mImageView;
         @BindView(R.id.title)
         public TextView mTitleView;
-        @BindView(R.id.year)
-        public TextView mYearView;
         @BindView(R.id.overview)
         public TextView mOverView;
 

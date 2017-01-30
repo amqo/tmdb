@@ -24,15 +24,14 @@ import io.reactivex.functions.Consumer;
 
 public class MoviesFragment extends Fragment {
 
-    @Inject
-    MoviesActivityPresenter mMoviesController;
+    @Inject MoviesActivityPresenter mMoviesController;
+    @Inject OnMoviesInteractionListener mMoviesInteractionListener;
 
     private RecyclerView mRecyclerView;
     private MoviesRecyclerViewAdapter mMoviesRecyclerViewAdapter;
     private boolean mIsLoading = false;
 
     private int mColumnCount = 1;
-    private OnMoviesInteractionListener mListener;
 
     public MoviesFragment() {
     }
@@ -91,7 +90,8 @@ public class MoviesFragment extends Fragment {
 
         MoviesApplication.getInstance().getMainActivityComponent().inject(this);
 
-        mMoviesRecyclerViewAdapter = new MoviesRecyclerViewAdapter(new ArrayList<Movie>(), mListener,
+        mMoviesRecyclerViewAdapter = new MoviesRecyclerViewAdapter(
+                new ArrayList<Movie>(), mMoviesInteractionListener,
                 new MoviesRecyclerViewAdapter.OnConsumeMoviesListener() {
                     @Override
                     public void getMovies(int page, Consumer<Movies> consumer) {
@@ -103,23 +103,6 @@ public class MoviesFragment extends Fragment {
                     }
                 });
         mRecyclerView.setAdapter(mMoviesRecyclerViewAdapter);
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnMoviesInteractionListener) {
-            mListener = (OnMoviesInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnMoviesInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
     }
 
     public interface OnMoviesInteractionListener {

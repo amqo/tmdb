@@ -1,6 +1,7 @@
 package amqo.com.privaliatmdb.injection.modules;
 
 import amqo.com.privaliatmdb.MainActivity;
+import amqo.com.privaliatmdb.fragments.MoviesFragment.OnMoviesInteractionListener;
 import amqo.com.privaliatmdb.injection.scopes.PerFragment;
 import dagger.Module;
 import dagger.Provides;
@@ -15,7 +16,7 @@ public class MainActivityModule {
     }
 
     @Provides @PerFragment
-    MainActivity providesMainActivity() {
+    OnMoviesInteractionListener providesMainActivity() {
         return mMainActivity;
     }
 

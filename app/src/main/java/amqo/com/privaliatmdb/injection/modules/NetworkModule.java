@@ -4,9 +4,7 @@ import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
 import amqo.com.privaliatmdb.MoviesApplication;
 import amqo.com.privaliatmdb.injection.scopes.PerFragment;
-import amqo.com.privaliatmdb.network.MovieParameterCreator;
 import amqo.com.privaliatmdb.network.MoviesEndpoint;
-import amqo.com.privaliatmdb.network.PopularMoviesParametersCreator;
 import dagger.Module;
 import dagger.Provides;
 import okhttp3.Cache;
@@ -23,7 +21,6 @@ public class NetworkModule {
         Cache cache = new Cache(application.getCacheDir(), cacheSize);
         return cache;
     }
-
 
     @Provides @PerFragment
     OkHttpClient providesOkHttpClient(Cache cache) {
@@ -44,15 +41,5 @@ public class NetworkModule {
                 .build();
 
         return retrofit;
-    }
-
-    @Provides @PerFragment
-    MoviesEndpoint providesMoviesEndpoint(Retrofit retrofit) {
-        return retrofit.create(MoviesEndpoint.class);
-    }
-
-    @Provides @PerFragment
-    MovieParameterCreator providesMovieParameterCreator() {
-        return new PopularMoviesParametersCreator();
     }
 }

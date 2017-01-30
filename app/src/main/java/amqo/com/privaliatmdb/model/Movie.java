@@ -35,7 +35,11 @@ public class Movie {
         return mTitle;
     }
 
-    public String getReleaseYear() {
+    public String getTitleWithYear() {
+        return mTitle + " (" + getReleaseYear() + ")";
+    }
+
+    private String getReleaseYear() {
         return mReleaseDate.isEmpty() ?
                 "" : mReleaseDate.substring(0, 4);
     }
