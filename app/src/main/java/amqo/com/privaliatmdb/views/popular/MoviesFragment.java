@@ -1,4 +1,4 @@
-package amqo.com.privaliatmdb.fragments;
+package amqo.com.privaliatmdb.views.popular;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -7,12 +7,14 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import amqo.com.privaliatmdb.MoviesApplication;
 import amqo.com.privaliatmdb.R;
@@ -22,7 +24,6 @@ import amqo.com.privaliatmdb.model.MoviesContract;
 public class MoviesFragment extends Fragment implements MoviesContract.View {
 
     @Inject MoviesContract.Presenter mMoviesPresenter;
-    @Inject @Named("activity") MoviesContract.View mParentMoviesView;
 
     private RecyclerView mRecyclerView;
     private MoviesRecyclerViewAdapter mMoviesRecyclerViewAdapter;
@@ -72,6 +73,11 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
     }
 
     @Override
+    public void refreshMovies() {
+        mMoviesRecyclerViewAdapter.refreshMovies();
+    }
+
+    @Override
     public void setLoading(boolean loading) {
         // TODO show or hide refresh layout
         mIsLoading = loading;
@@ -79,7 +85,16 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
 
     @Override
     public void onMovieInteraction(Movie movie) {
-        mParentMoviesView.onMovieInteraction(movie);
+
+    }
+
+    @Override
+    public int getScreenDensity() {
+        WindowManager windowManager = getActivity().getWindowManager();
+        Display display = windowManager.getDefaultDisplay();
+        DisplayMetrics metrics = new DisplayMetrics();
+        display.getMetrics(metrics);
+        return (int)metrics.xdpi;
     }
 
     private class MoviesScrollListener extends RecyclerView.OnScrollListener {

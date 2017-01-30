@@ -1,5 +1,7 @@
 package amqo.com.privaliatmdb;
 
+import android.content.SharedPreferences;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,8 +15,7 @@ import java.util.Map;
 import amqo.com.privaliatmdb.model.Movies;
 import amqo.com.privaliatmdb.model.MoviesContract;
 import amqo.com.privaliatmdb.network.MoviesEndpoint;
-import amqo.com.privaliatmdb.network.MovieParameterCreator;
-import amqo.com.privaliatmdb.network.PopularMoviesParametersCreator;
+import amqo.com.privaliatmdb.views.MoviesPresenter;
 import io.reactivex.Observable;
 import io.reactivex.functions.Consumer;
 
@@ -33,12 +34,10 @@ public class MoviesActivityPresenterTest {
     private Observable<Movies> mObservableMoviesMock;
 
     @Mock
-    private MovieParameterCreator mMovieParameterCreatorMock;
-
-    @Mock
     private MoviesContract.View mMoviesViewMock;
 
-    private MovieParameterCreator mMovieParameterCreator;
+    @Mock
+    SharedPreferences mSharedPreferencesMock;
 
     private MoviesPresenter mMoviesActivityPresenter;
 
@@ -46,18 +45,14 @@ public class MoviesActivityPresenterTest {
 
     @Before
     public void setUp() {
-        mMovieParameterCreator = new PopularMoviesParametersCreator();
         mMoviesActivityPresenter = new MoviesPresenter(
-                mMovieParameterCreator,
                 mMoviesEndpointInterfaceMock,
-                mMoviesViewMock);
+                mMoviesViewMock,
+                mSharedPreferencesMock);
     }
 
     @Test
     public void getMovies_callCorrectMethods() {
-
-        mMoviesActivityPresenter = new MoviesPresenter(
-                mMovieParameterCreatorMock, mMoviesEndpointInterfaceMock, mMoviesViewMock);
 
         Consumer<Movies> consumer = new Consumer<Movies>() {
             @Override
@@ -73,7 +68,7 @@ public class MoviesActivityPresenterTest {
         mMoviesActivityPresenter.getMovies(DEFAULT_PAGE, consumer);
 
         verify(mMoviesEndpointInterfaceMock).getMovies(any(Integer.class), any(Map.class));
-        verify(mMovieParameterCreatorMock).createParameters(DEFAULT_PAGE);
+        verify(mMoviesViewMock).setLoading(true);
     }
 
     @Test

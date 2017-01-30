@@ -8,7 +8,7 @@ import amqo.com.privaliatmdb.injection.modules.MainActivityModule;
 import dagger.Component;
 
 @Singleton
-@Component(modules = {ApplicationModule.class})
+@Component(modules = { ApplicationModule.class })
 public interface ApplicationComponent {
 
     MoviesApplication application();

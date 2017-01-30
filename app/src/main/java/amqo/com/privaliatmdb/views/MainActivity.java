@@ -1,22 +1,21 @@
-package amqo.com.privaliatmdb;
+package amqo.com.privaliatmdb.views;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import amqo.com.privaliatmdb.model.Movie;
-import amqo.com.privaliatmdb.model.MoviesContract;
+import amqo.com.privaliatmdb.MoviesApplication;
+import amqo.com.privaliatmdb.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-public class MainActivity extends AppCompatActivity implements MoviesContract.View {
+public class MainActivity extends AppCompatActivity {
 
     @BindView(R.id.fab)
     FloatingActionButton mToolbarFAB;
@@ -65,15 +64,5 @@ public class MainActivity extends AppCompatActivity implements MoviesContract.Vi
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void setLoading(boolean loading) {
-
-    }
-
-    @Override
-    public void onMovieInteraction(Movie item) {
-        Log.i("", item.toString());
     }
 }

@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="amqo.com.privaliatmdb.MainActivity"
+    tools:context="amqo.com.privaliatmdb.views.MainActivity"
     tools:showIn="@layout/activity_main">
 
     <FrameLayout
@@ -16,7 +16,7 @@
         <fragment
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:name="amqo.com.privaliatmdb.fragments.MoviesFragment"
+            android:name="amqo.com.privaliatmdb.views.popular.MoviesFragment"
             android:id="@+id/fragment" />
     </FrameLayout>
 

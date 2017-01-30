@@ -7,6 +7,7 @@ import amqo.com.privaliatmdb.injection.DaggerApplicationComponent;
 import amqo.com.privaliatmdb.injection.MainActivityComponent;
 import amqo.com.privaliatmdb.injection.modules.ApplicationModule;
 import amqo.com.privaliatmdb.injection.modules.MainActivityModule;
+import amqo.com.privaliatmdb.views.MainActivity;
 
 public class MoviesApplication extends Application {
 

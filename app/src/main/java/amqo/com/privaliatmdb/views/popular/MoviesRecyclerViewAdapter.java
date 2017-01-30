@@ -1,6 +1,7 @@
-package amqo.com.privaliatmdb.fragments;
+package amqo.com.privaliatmdb.views.popular;
 
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +9,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,20 +71,26 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecycl
         holder.mTitleView.setText(movie.getTitleWithYear());
         holder.mOverView.setText(movie.getOverview());
 
-        Glide.with(MoviesApplication.getInstance()).load(movie.getPosterPath())
-                .centerCrop().crossFade().into(holder.mImageView);
-
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mMoviesView.onMovieInteraction(holder.mItem);
             }
         });
+
+        loadImageForMovie(holder, movie);
     }
 
     @Override
     public int getItemCount() {
         return mValues.size();
+    }
+
+    public void refreshMovies() {
+        int previousSize = mValues.size();
+        mValues.clear();
+        if (previousSize > 0) notifyItemRangeRemoved(0, previousSize);
+        mMoviesPresenter.getMovies(1, mMoviesConsumer);
     }
 
     public void addMovies(List<Movie> movies) {
@@ -92,6 +102,38 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecycl
     public void getMoreMovies() {
         mMoviesPresenter.getMovies(
                 mLastReceivedMovies.getPage() + 1, mMoviesConsumer);
+    }
+
+    private void loadImageForMovie(ViewHolder holder, Movie movie) {
+        String movieImagesBaseUrl = mMoviesPresenter.getMovieImagesBaseUrl();
+        if (TextUtils.isEmpty(movieImagesBaseUrl)) return;
+
+        RequestListener<String, GlideDrawable> requestListener =
+                new RequestListener<String, GlideDrawable>() {
+                    @Override
+                    public boolean onException(
+                            Exception e, String model, Target<GlideDrawable> target,
+                            boolean isFirstResource) {
+                        // Get configuration again, as this error should occurr if configuration changed in the API
+                        mMoviesPresenter.updateMoviesConfiguration();
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(
+                            GlideDrawable resource, String model,
+                            Target<GlideDrawable> target, boolean isFromMemoryCache,
+                            boolean isFirstResource) {
+                        return false;
+                    }
+                };
+
+        Glide.with(MoviesApplication.getInstance())
+                .load(movie.getPosterPath(movieImagesBaseUrl))
+                .centerCrop()
+                .crossFade()
+                .listener(requestListener)
+                .into(holder.mImageView);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -112,11 +154,6 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecycl
             mView = view;
 
             ButterKnife.bind(this, view);
-        }
-
-        @Override
-        public String toString() {
-            return super.toString() + " '" + mOverView.getText() + "'";
         }
     }
 }

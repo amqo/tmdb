@@ -1,5 +1,8 @@
 package amqo.com.privaliatmdb.injection.modules;
 
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+
 import javax.inject.Singleton;
 
 import amqo.com.privaliatmdb.MoviesApplication;
@@ -18,5 +21,10 @@ public class ApplicationModule {
     @Provides @Singleton
     MoviesApplication providesApplication() {
         return mApplication;
+    }
+
+    @Provides @Singleton
+    SharedPreferences provicesSharedPreferences() {
+        return PreferenceManager.getDefaultSharedPreferences(mApplication);
     }
 }

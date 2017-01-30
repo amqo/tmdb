@@ -1,15 +1,14 @@
 package amqo.com.privaliatmdb.injection.modules;
 
-import javax.inject.Named;
+import android.content.SharedPreferences;
 
-import amqo.com.privaliatmdb.MainActivity;
-import amqo.com.privaliatmdb.MoviesPresenter;
 import amqo.com.privaliatmdb.R;
-import amqo.com.privaliatmdb.fragments.MoviesFragment;
 import amqo.com.privaliatmdb.injection.scopes.PerFragment;
 import amqo.com.privaliatmdb.model.MoviesContract;
-import amqo.com.privaliatmdb.network.MovieParameterCreator;
 import amqo.com.privaliatmdb.network.MoviesEndpoint;
+import amqo.com.privaliatmdb.views.MainActivity;
+import amqo.com.privaliatmdb.views.MoviesPresenter;
+import amqo.com.privaliatmdb.views.popular.MoviesFragment;
 import dagger.Module;
 import dagger.Provides;
 
@@ -22,26 +21,21 @@ public class MainActivityModule {
         mMainActivity = activity;
     }
 
-    @Provides @PerFragment @Named("activity")
-    MoviesContract.View providesMainActivity() {
-        return mMainActivity;
-    }
-
-    @Provides @PerFragment @Named("fragment")
+    @Provides @PerFragment
     MoviesContract.View providesMoviesView() {
         MoviesFragment moviesFragment = (MoviesFragment)
                 mMainActivity.getSupportFragmentManager().findFragmentById(R.id.fragment);
         return moviesFragment;
     }
-
     @Provides @PerFragment
     MoviesContract.Presenter provicesMoviesPresenter(
             MoviesEndpoint moviesEndpoint,
-            MovieParameterCreator parameterCreator,
-            @Named("fragment") MoviesContract.View moviesView) {
+            SharedPreferences sharedPreferences,
+            MoviesContract.View moviesView) {
 
-         return new MoviesPresenter(parameterCreator, moviesEndpoint, moviesView);
+        return new MoviesPresenter(moviesEndpoint, moviesView, sharedPreferences);
     }
+
 
 
 }
