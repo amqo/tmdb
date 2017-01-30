@@ -2,6 +2,7 @@ package amqo.com.privaliatmdb.views.popular;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
@@ -31,6 +32,8 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
     SwipeRefreshLayout mSwipeRefreshLayout;
     @BindView(R.id.list)
     RecyclerView mRecyclerView;
+    @BindView(R.id.up_fab)
+    FloatingActionButton mUpFAB;
 
     private MoviesRecyclerViewAdapter mMoviesRecyclerViewAdapter;
     private boolean mIsLoading = false;
@@ -49,6 +52,13 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
 
         initRecyclerView();
 
+        mUpFAB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mUpFAB.setVisibility(View.GONE);
+                mRecyclerView.scrollToPosition(0);
+            }
+        });
         mSwipeRefreshLayout.setOnRefreshListener(
                 new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -121,6 +131,8 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
 
     private class MoviesScrollListener extends RecyclerView.OnScrollListener {
 
+        private final int THREESHOLD = 2;
+
         private RecyclerView.LayoutManager layoutManager;
 
         public MoviesScrollListener(RecyclerView.LayoutManager layoutManager) {
@@ -130,6 +142,7 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
         @Override
         public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
             super.onScrolled(recyclerView, dx, dy);
+
             if (mIsLoading)
                 return;
             int visibleItemCount = layoutManager.getChildCount();
@@ -143,7 +156,14 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
                 pastVisibleItems = ((GridLayoutManager)layoutManager)
                         .findFirstVisibleItemPosition();
 
-            if (pastVisibleItems + visibleItemCount >= totalItemCount - 2) {
+            if (dy < 0 && mUpFAB.getVisibility() == View.GONE && pastVisibleItems > THREESHOLD) {
+                mUpFAB.setVisibility(View.VISIBLE);
+            } else if ((dy >= 0 || pastVisibleItems < THREESHOLD + 1) &&
+                    mUpFAB.getVisibility() == View.VISIBLE) {
+                mUpFAB.setVisibility(View.GONE);
+            }
+
+            if (pastVisibleItems + visibleItemCount >= totalItemCount - THREESHOLD) {
                 mMoviesRecyclerViewAdapter.getMoreMovies();
                 mIsLoading = true;
             }

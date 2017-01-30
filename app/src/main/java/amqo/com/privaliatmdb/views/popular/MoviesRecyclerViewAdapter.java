@@ -69,6 +69,7 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecycl
         holder.mItem = movie;
 
         holder.mTitleView.setText(movie.getTitleWithYear());
+        holder.mTitleRankView.setText(Integer.toString(position + 1));
         holder.mOverView.setText(movie.getOverview());
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
@@ -144,6 +145,8 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecycl
         public ImageView mImageView;
         @BindView(R.id.title)
         public TextView mTitleView;
+        @BindView(R.id.title_rank)
+        public TextView mTitleRankView;
         @BindView(R.id.overview)
         public TextView mOverView;
 
