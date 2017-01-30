@@ -11,6 +11,7 @@ import org.mockito.stubbing.Answer;
 import java.util.Map;
 
 import amqo.com.privaliatmdb.model.Movies;
+import amqo.com.privaliatmdb.model.MoviesContract;
 import amqo.com.privaliatmdb.network.MoviesEndpoint;
 import amqo.com.privaliatmdb.network.MovieParameterCreator;
 import amqo.com.privaliatmdb.network.PopularMoviesParametersCreator;
@@ -34,24 +35,29 @@ public class MoviesActivityPresenterTest {
     @Mock
     private MovieParameterCreator mMovieParameterCreatorMock;
 
+    @Mock
+    private MoviesContract.View mMoviesViewMock;
+
     private MovieParameterCreator mMovieParameterCreator;
 
-    private MoviesActivityPresenter mMoviesActivityPresenter;
+    private MoviesPresenter mMoviesActivityPresenter;
 
     private final int DEFAULT_PAGE = 1;
 
     @Before
     public void setUp() {
         mMovieParameterCreator = new PopularMoviesParametersCreator();
-        mMoviesActivityPresenter = new MoviesActivityPresenter(
-                mMovieParameterCreator, mMoviesEndpointInterfaceMock);
+        mMoviesActivityPresenter = new MoviesPresenter(
+                mMovieParameterCreator,
+                mMoviesEndpointInterfaceMock,
+                mMoviesViewMock);
     }
 
     @Test
     public void getMovies_callCorrectMethods() {
 
-        mMoviesActivityPresenter = new MoviesActivityPresenter(
-                mMovieParameterCreatorMock, mMoviesEndpointInterfaceMock);
+        mMoviesActivityPresenter = new MoviesPresenter(
+                mMovieParameterCreatorMock, mMoviesEndpointInterfaceMock, mMoviesViewMock);
 
         Consumer<Movies> consumer = new Consumer<Movies>() {
             @Override

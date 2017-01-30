@@ -10,13 +10,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import amqo.com.privaliatmdb.fragments.MoviesFragment.OnMoviesInteractionListener;
 import amqo.com.privaliatmdb.model.Movie;
+import amqo.com.privaliatmdb.model.MoviesContract;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-public class MainActivity extends AppCompatActivity implements OnMoviesInteractionListener {
+public class MainActivity extends AppCompatActivity implements MoviesContract.View {
 
     @BindView(R.id.fab)
     FloatingActionButton mToolbarFAB;
@@ -65,6 +65,11 @@ public class MainActivity extends AppCompatActivity implements OnMoviesInteracti
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void setLoading(boolean loading) {
+
     }
 
     @Override

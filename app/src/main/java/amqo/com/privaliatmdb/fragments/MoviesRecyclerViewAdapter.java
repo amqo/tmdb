@@ -9,13 +9,14 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import amqo.com.privaliatmdb.MoviesApplication;
 import amqo.com.privaliatmdb.R;
-import amqo.com.privaliatmdb.fragments.MoviesFragment.OnMoviesInteractionListener;
 import amqo.com.privaliatmdb.model.Movie;
 import amqo.com.privaliatmdb.model.Movies;
+import amqo.com.privaliatmdb.model.MoviesContract;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.functions.Consumer;
@@ -25,30 +26,28 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecycl
     private Consumer<Movies> mMoviesConsumer;
 
     private final List<Movie> mValues;
-    private final OnMoviesInteractionListener mListener;
-    private final OnConsumeMoviesListener mConsumerListener;
+    private final MoviesContract.View mMoviesView;
+    private final MoviesContract.Presenter mMoviesPresenter;
 
     private Movies mLastReceivedMovies;
 
     public MoviesRecyclerViewAdapter(
-            List<Movie> items,
-            OnMoviesInteractionListener listener,
-            OnConsumeMoviesListener consumerListener) {
+            MoviesContract.View moviesView,
+            MoviesContract.Presenter presenter) {
 
-        mValues = items;
-        mListener = listener;
-        mConsumerListener = consumerListener;
+        mValues = new ArrayList<>();
+        mMoviesView = moviesView;
+        mMoviesPresenter = presenter;
 
         mMoviesConsumer = new Consumer<Movies>() {
             @Override
             public void accept(Movies movies) throws Exception {
                 mLastReceivedMovies = movies;
-                mConsumerListener.onMoviesReceived();
                 addMovies(movies.getMovies());
             }
         };
 
-        mConsumerListener.getMovies(1, mMoviesConsumer);
+        mMoviesPresenter.getMovies(1, mMoviesConsumer);
     }
 
     @Override
@@ -74,9 +73,7 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecycl
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (null != mListener) {
-                    mListener.onMovieInteraction(holder.mItem);
-                }
+                mMoviesView.onMovieInteraction(holder.mItem);
             }
         });
     }
@@ -93,7 +90,7 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecycl
     }
 
     public void getMoreMovies() {
-        mConsumerListener.getMovies(
+        mMoviesPresenter.getMovies(
                 mLastReceivedMovies.getPage() + 1, mMoviesConsumer);
     }
 
@@ -121,10 +118,5 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecycl
         public String toString() {
             return super.toString() + " '" + mOverView.getText() + "'";
         }
-    }
-
-    public interface OnConsumeMoviesListener {
-        void getMovies(int page, Consumer<Movies> consumer);
-        void onMoviesReceived();
     }
 }

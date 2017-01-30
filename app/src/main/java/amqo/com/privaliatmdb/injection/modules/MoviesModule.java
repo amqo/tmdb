@@ -11,8 +11,7 @@ import retrofit2.Retrofit;
 @Module
 public class MoviesModule {
 
-    @Provides
-    @PerFragment
+    @Provides @PerFragment
     MoviesEndpoint providesMoviesEndpoint(Retrofit retrofit) {
         return retrofit.create(MoviesEndpoint.class);
     }

@@ -11,21 +11,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.ArrayList;
-
 import javax.inject.Inject;
+import javax.inject.Named;
 
-import amqo.com.privaliatmdb.MoviesActivityPresenter;
 import amqo.com.privaliatmdb.MoviesApplication;
 import amqo.com.privaliatmdb.R;
 import amqo.com.privaliatmdb.model.Movie;
-import amqo.com.privaliatmdb.model.Movies;
-import io.reactivex.functions.Consumer;
+import amqo.com.privaliatmdb.model.MoviesContract;
 
-public class MoviesFragment extends Fragment {
+public class MoviesFragment extends Fragment implements MoviesContract.View {
 
-    @Inject MoviesActivityPresenter mMoviesController;
-    @Inject OnMoviesInteractionListener mMoviesInteractionListener;
+    @Inject MoviesContract.Presenter mMoviesPresenter;
+    @Inject @Named("activity") MoviesContract.View mParentMoviesView;
 
     private RecyclerView mRecyclerView;
     private MoviesRecyclerViewAdapter mMoviesRecyclerViewAdapter;
@@ -56,29 +53,8 @@ public class MoviesFragment extends Fragment {
                 mRecyclerView.setLayoutManager(layoutManager);
             }
 
-            RecyclerView.OnScrollListener mScrollListener = new RecyclerView.OnScrollListener() {
-                @Override
-                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                    super.onScrolled(recyclerView, dx, dy);
-                    if (mIsLoading)
-                        return;
-                    int visibleItemCount = layoutManager.getChildCount();
-                    int totalItemCount = layoutManager.getItemCount();
-
-                    int pastVisibleItems = 0;
-                    if (layoutManager instanceof LinearLayoutManager)
-                        pastVisibleItems = ((LinearLayoutManager)layoutManager)
-                                .findFirstVisibleItemPosition();
-                    if (layoutManager instanceof GridLayoutManager)
-                        pastVisibleItems = ((GridLayoutManager)layoutManager)
-                                .findFirstVisibleItemPosition();
-
-                    if (pastVisibleItems + visibleItemCount >= totalItemCount - 2) {
-                        mMoviesRecyclerViewAdapter.getMoreMovies();
-                        mIsLoading = true;
-                    }
-                }
-            };
+            RecyclerView.OnScrollListener mScrollListener =
+                    new MoviesScrollListener(layoutManager);
             mRecyclerView.addOnScrollListener(mScrollListener);
         }
         return view;
@@ -91,21 +67,49 @@ public class MoviesFragment extends Fragment {
         MoviesApplication.getInstance().getMainActivityComponent().inject(this);
 
         mMoviesRecyclerViewAdapter = new MoviesRecyclerViewAdapter(
-                new ArrayList<Movie>(), mMoviesInteractionListener,
-                new MoviesRecyclerViewAdapter.OnConsumeMoviesListener() {
-                    @Override
-                    public void getMovies(int page, Consumer<Movies> consumer) {
-                        mMoviesController.getMovies(page, consumer);
-                    }
-                    @Override
-                    public void onMoviesReceived() {
-                        mIsLoading = false;
-                    }
-                });
+                this, mMoviesPresenter);
         mRecyclerView.setAdapter(mMoviesRecyclerViewAdapter);
     }
 
-    public interface OnMoviesInteractionListener {
-        void onMovieInteraction(Movie item);
+    @Override
+    public void setLoading(boolean loading) {
+        // TODO show or hide refresh layout
+        mIsLoading = loading;
+    }
+
+    @Override
+    public void onMovieInteraction(Movie movie) {
+        mParentMoviesView.onMovieInteraction(movie);
+    }
+
+    private class MoviesScrollListener extends RecyclerView.OnScrollListener {
+
+        private RecyclerView.LayoutManager layoutManager;
+
+        public MoviesScrollListener(RecyclerView.LayoutManager layoutManager) {
+            this.layoutManager = layoutManager;
+        }
+
+        @Override
+        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            super.onScrolled(recyclerView, dx, dy);
+            if (mIsLoading)
+                return;
+            int visibleItemCount = layoutManager.getChildCount();
+            int totalItemCount = layoutManager.getItemCount();
+
+            int pastVisibleItems = 0;
+            if (layoutManager instanceof LinearLayoutManager)
+                pastVisibleItems = ((LinearLayoutManager)layoutManager)
+                        .findFirstVisibleItemPosition();
+            if (layoutManager instanceof GridLayoutManager)
+                pastVisibleItems = ((GridLayoutManager)layoutManager)
+                        .findFirstVisibleItemPosition();
+
+            if (pastVisibleItems + visibleItemCount >= totalItemCount - 2) {
+                mMoviesRecyclerViewAdapter.getMoreMovies();
+                mIsLoading = true;
+            }
+        }
     }
 }
