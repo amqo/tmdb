@@ -27,4 +27,9 @@ public interface MoviesEndpoint {
     Observable<MoviesConfiguration> getMoviesConfiguration(
             @Path("version") int versionCode,
             @QueryMap Map<String, String> parameters);
+
+    @GET("{version}/search/movie")
+    Observable<Movies> searchMovies(
+            @Path("version") int versionCode,
+            @QueryMap Map<String, String> parameters);
 }

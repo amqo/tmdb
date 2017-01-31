@@ -1,10 +1,10 @@
-package amqo.com.privaliatmdb.views;
+package amqo.com.privaliatmdb.views.popular;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -14,7 +14,7 @@ import android.view.View;
 
 import amqo.com.privaliatmdb.MoviesApplication;
 import amqo.com.privaliatmdb.R;
-import amqo.com.privaliatmdb.views.popular.MoviesFragment;
+import amqo.com.privaliatmdb.views.search.SearchMoviesActivity;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
             transaction.commit();
         }
 
-        MoviesApplication.getInstance().createMainActivityComponent(moviesFragment);
+        MoviesApplication.getInstance().createMoviesComponent(moviesFragment);
 
         initViews();
     }
@@ -62,14 +62,16 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         mUnbinder.unbind();
-        MoviesApplication.getInstance().releaseMainActivityComponent();
+        MoviesApplication.getInstance().releaseMoviesComponent();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+
         getMenuInflater().inflate(R.menu.menu_main, menu);
         MenuItem searchItem = menu.findItem(R.id.action_search);
         searchItem.setVisible(!mHideSearch);
+
         return true;
     }
 
@@ -78,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == R.id.action_search) {
+            goToSearchActivity();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -88,8 +91,7 @@ public class MainActivity extends AppCompatActivity {
         mToolbarFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Use this to make some action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                goToSearchActivity();
 
             }
         });
@@ -108,5 +110,10 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void goToSearchActivity() {
+        Intent searchIntent = new Intent(this, SearchMoviesActivity.class);
+        startActivity(searchIntent);
     }
 }

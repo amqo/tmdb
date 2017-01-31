@@ -18,12 +18,13 @@ import amqo.com.privaliatmdb.model.Movie;
 import amqo.com.privaliatmdb.model.Movies;
 import amqo.com.privaliatmdb.model.MoviesContract;
 import amqo.com.privaliatmdb.model.MoviesScrollContract;
+import amqo.com.privaliatmdb.views.MoviesRecyclerViewAdapter;
 import amqo.com.privaliatmdb.views.utils.ScreenHelper;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MoviesFragment extends Fragment
-        implements MoviesContract.View, MoviesScrollContract.View {
+        implements MoviesContract.View, MoviesScrollContract.FabView {
 
     @Inject MoviesContract.Presenter mMoviesPresenter;
     @Inject RecyclerView.LayoutManager mLayoutManager;
@@ -51,7 +52,7 @@ public class MoviesFragment extends Fragment
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        MoviesApplication.getInstance().getMainActivityComponent().inject(this);
+        MoviesApplication.getInstance().getMoviesComponent().inject(this);
     }
 
     @Override

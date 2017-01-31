@@ -20,6 +20,19 @@ public abstract class MovieParameterCreator {
         return parameters;
     }
 
+    public static Map<String, String> createSearchParameters(int page, String query) {
+
+        // https://api.themoviedb.org/3/search/movie?api_key=XXXX&language=en-US&query=Pets&page=1&include_adult=false
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("language", getCountryCode());
+        parameters.put("page", Integer.toString(page));
+        parameters.put("query", query);
+        parameters.put("include_adult", "false");
+        parameters.put("api_key", PrivateConstants.TMDB_API_KEY);
+        return parameters;
+    }
+
     public static Map<String, String> createMoviesConfigurationParameters() {
 
         // https://api.themoviedb.org/3/configuration?&api_key=XXXX

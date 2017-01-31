@@ -13,13 +13,13 @@
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/list"
-            android:name="amqo.com.privaliatmdb.fragments.MoviesFragment"
+            android:name="amqo.com.privaliatmdb.fragments.SearchMoviesFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
             app:layoutManager="LinearLayoutManager"
-            tools:context=".views.popular.MainActivity"
+            tools:context=".views.search.SearchMoviesActivity"
             tools:listitem="@layout/movie_item" />
 
     </android.support.v4.widget.SwipeRefreshLayout>
@@ -37,6 +37,7 @@
         app:useCompatPadding="true" />
 
 </RelativeLayout>
+
 
 
 

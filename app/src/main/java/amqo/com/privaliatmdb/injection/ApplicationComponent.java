@@ -5,6 +5,7 @@ import javax.inject.Singleton;
 import amqo.com.privaliatmdb.MoviesApplication;
 import amqo.com.privaliatmdb.injection.modules.ApplicationModule;
 import amqo.com.privaliatmdb.injection.modules.MoviesModule;
+import amqo.com.privaliatmdb.injection.modules.SearchMoviesModule;
 import dagger.Component;
 
 @Singleton
@@ -15,5 +16,8 @@ public interface ApplicationComponent {
 
     MoviesComponent getMoviesComponent(
             MoviesModule moviesModule);
+
+    SearchMoviesComponent getSearchMoviesComponent(
+            SearchMoviesModule moviesModule);
 }
 

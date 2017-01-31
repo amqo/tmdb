@@ -1,7 +1,5 @@
 package amqo.com.privaliatmdb.views.popular;
 
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 import java.util.Timer;
@@ -10,54 +8,38 @@ import java.util.TimerTask;
 import javax.inject.Inject;
 
 import amqo.com.privaliatmdb.MoviesApplication;
-import amqo.com.privaliatmdb.R;
 import amqo.com.privaliatmdb.model.MoviesScrollContract;
+import amqo.com.privaliatmdb.views.BaseScrollListener;
 
-public class MoviesScrollListener extends RecyclerView.OnScrollListener {
+public class MoviesScrollListener extends BaseScrollListener {
 
     private final int TIMER_DELAY = 500;
-
-    private final MoviesScrollContract.View mMoviesScrollView;
-    private final int THRESHOLD;
 
     private Timer mShowFabTimer;
 
     private boolean mScrollingUp = false;
 
+    private final MoviesScrollContract.FabView mMoviesScrollFabView;
+
     @Inject
     public MoviesScrollListener(
             MoviesApplication context,
-            MoviesScrollContract.View moviesScrollView) {
+            MoviesScrollContract.FabView moviesScrollView) {
 
-        THRESHOLD = context.getResources().getInteger(R.integer.grid_columns) * 2;
+        super(context, moviesScrollView);
 
-        mMoviesScrollView = moviesScrollView;
+        mMoviesScrollFabView = moviesScrollView;
     }
 
     @Override
     public void onScrolled(RecyclerView recyclerView, int dx, final int dy) {
+
         super.onScrolled(recyclerView, dx, dy);
 
         if (mMoviesScrollView.isLoading())
             return;
 
-        RecyclerView.LayoutManager layoutManager = mMoviesScrollView.getLayoutManager();
-        int visibleItemCount = layoutManager.getChildCount();
-        int totalItemCount = layoutManager.getItemCount();
-
-        int pastVisibleItems = 0;
-        if (layoutManager instanceof LinearLayoutManager)
-            pastVisibleItems = ((LinearLayoutManager)layoutManager)
-                    .findFirstVisibleItemPosition();
-        if (layoutManager instanceof GridLayoutManager)
-            pastVisibleItems = ((GridLayoutManager)layoutManager)
-                    .findFirstVisibleItemPosition();
-
-        if (pastVisibleItems + visibleItemCount >= totalItemCount - THRESHOLD) {
-            mMoviesScrollView.loadMoreMovies();
-        }
-
-        manageFABVisibility(dy, pastVisibleItems);
+        manageFABVisibility(dy, getPastVisibleItems());
     }
 
     private void manageFABVisibility(int dy, final int pastItems) {
@@ -74,8 +56,8 @@ public class MoviesScrollListener extends RecyclerView.OnScrollListener {
         // If FAB is visible and is scrolling down,
         // or reach a top item position, make FAB gone automatically
         if ((!mScrollingUp || pastItems < THRESHOLD + 1) &&
-                mMoviesScrollView.isUpFABVisible()) {
-            mMoviesScrollView.setShownUpFAB(false);
+                mMoviesScrollFabView.isUpFABVisible()) {
+            mMoviesScrollFabView.setShownUpFAB(false);
         }
 
         // If no change in scroll direction, keep FAB visibility
@@ -87,8 +69,8 @@ public class MoviesScrollListener extends RecyclerView.OnScrollListener {
             public void run() {
                 // If scrolling up and FAB is not already visible, and not in top item position,
                 // then make FAB visible, unless a change in scroll direction occurs before timer delay
-                if (mScrollingUp && !mMoviesScrollView.isUpFABVisible() && pastItems > THRESHOLD) {
-                    mMoviesScrollView.setShownUpFAB(true);
+                if (mScrollingUp && !mMoviesScrollFabView.isUpFABVisible() && pastItems > THRESHOLD) {
+                    mMoviesScrollFabView.setShownUpFAB(true);
                 }
             }
         }, TIMER_DELAY);

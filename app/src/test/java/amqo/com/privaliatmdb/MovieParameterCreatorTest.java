@@ -40,6 +40,28 @@ public class MovieParameterCreatorTest {
         assertEquals(parameters.get("api_key"), PrivateConstants.TMDB_API_KEY);
     }
 
+    @Test
+    public void createSearchParameters_FirstPage() {
+        Map<String, String> parameters = MovieParameterCreator.createSearchParameters(1, "Test");
+        assertEquals(parameters.size(), 5);
+        assertEquals(parameters.get("include_adult"), "false");
+        assertEquals(parameters.get("query"), "Test");
+        assertEquals(parameters.get("api_key"), PrivateConstants.TMDB_API_KEY);
+        assertEquals(parameters.get("page"), Integer.toString(1));
+        assertFalse(parameters.get("language").isEmpty());
+    }
+
+    @Test
+    public void createSearchParameters_SecondPage() {
+        Map<String, String> parameters = MovieParameterCreator.createSearchParameters(2, "Other Test");
+        assertEquals(parameters.size(), 5);
+        assertEquals(parameters.get("include_adult"), "false");
+        assertEquals(parameters.get("query"), "Other Test");
+        assertEquals(parameters.get("api_key"), PrivateConstants.TMDB_API_KEY);
+        assertEquals(parameters.get("page"), Integer.toString(2));
+        assertFalse(parameters.get("language").isEmpty());
+    }
+
     private void checkCommonParameters(Map<String, String> parameters) {
         assertEquals(parameters.size(), 4);
         assertEquals(parameters.get("sort_by"), "popularity.desc");

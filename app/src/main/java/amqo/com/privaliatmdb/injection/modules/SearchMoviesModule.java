@@ -12,17 +12,17 @@ import amqo.com.privaliatmdb.model.MoviesContract;
 import amqo.com.privaliatmdb.model.MoviesScrollContract;
 import amqo.com.privaliatmdb.network.MoviesEndpoint;
 import amqo.com.privaliatmdb.views.MoviesPresenter;
-import amqo.com.privaliatmdb.views.popular.MoviesFragment;
+import amqo.com.privaliatmdb.views.search.SearchMoviesFragment;
 import dagger.Module;
 import dagger.Provides;
 import retrofit2.Retrofit;
 
 @Module
-public class MoviesModule {
+public class SearchMoviesModule {
 
-    private MoviesFragment mMoviesFragment;
+    private SearchMoviesFragment mMoviesFragment;
 
-    public MoviesModule(MoviesFragment fragment) {
+    public SearchMoviesModule(SearchMoviesFragment fragment) {
         mMoviesFragment = fragment;
     }
 
@@ -50,7 +50,7 @@ public class MoviesModule {
     }
 
     @Provides @PerFragment
-    MoviesScrollContract.FabView providesMoviesScrollView() {
+    MoviesScrollContract.View providesMoviesScrollView() {
         return mMoviesFragment;
     }
 
