@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
@@ -20,14 +21,13 @@ import amqo.com.privaliatmdb.MoviesApplication;
 import amqo.com.privaliatmdb.R;
 import amqo.com.privaliatmdb.model.Movie;
 import amqo.com.privaliatmdb.model.Movies;
+import amqo.com.privaliatmdb.model.MoviesAdapterContract;
 import amqo.com.privaliatmdb.model.MoviesContract;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.reactivex.functions.Consumer;
 
-public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecyclerViewAdapter.ViewHolder> {
-
-    private Consumer<Movies> mMoviesConsumer;
+public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecyclerViewAdapter.ViewHolder>
+    implements MoviesAdapterContract.View {
 
     private final List<Movie> mValues;
     private final MoviesContract.View mMoviesView;
@@ -42,16 +42,6 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecycl
         mValues = new ArrayList<>();
         mMoviesView = moviesView;
         mMoviesPresenter = presenter;
-
-        mMoviesConsumer = new Consumer<Movies>() {
-            @Override
-            public void accept(Movies movies) throws Exception {
-                mLastReceivedMovies = movies;
-                addMovies(movies.getMovies());
-            }
-        };
-
-        mMoviesPresenter.getMovies(1, mMoviesConsumer);
     }
 
     @Override
@@ -87,22 +77,25 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecycl
         return mValues.size();
     }
 
-    public void refreshMovies() {
+    @Override
+    public void refreshMovies(Movies movies) {
         int previousSize = mValues.size();
         mValues.clear();
         if (previousSize > 0) notifyItemRangeRemoved(0, previousSize);
-        mMoviesPresenter.getMovies(1, mMoviesConsumer);
+        addMovies(movies);
     }
 
-    public void addMovies(List<Movie> movies) {
+    @Override
+    public void addMovies(Movies movies) {
         int previousSize = mValues.size();
-        mValues.addAll(movies);
+        mValues.addAll(movies.getMovies());
         notifyItemRangeInserted(previousSize, mValues.size());
+        mLastReceivedMovies = movies;
     }
 
-    public void getMoreMovies() {
-        mMoviesPresenter.getMovies(
-                mLastReceivedMovies.getPage() + 1, mMoviesConsumer);
+    @Override
+    public int getLastPageLoaded() {
+        return mLastReceivedMovies.getPage();
     }
 
     private void loadImageForMovie(ViewHolder holder, Movie movie) {
@@ -115,7 +108,7 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecycl
                     public boolean onException(
                             Exception e, String model, Target<GlideDrawable> target,
                             boolean isFirstResource) {
-                        // Get configuration again, as this error should occurr if configuration changed in the API
+                        // Get configuration again, as this error should occur if configuration changed in the API
                         mMoviesPresenter.updateMoviesConfiguration();
                         return false;
                     }
@@ -131,8 +124,9 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecycl
 
         Glide.with(MoviesApplication.getInstance())
                 .load(movie.getPosterPath(movieImagesBaseUrl))
-                .centerCrop()
+                .fitCenter()
                 .crossFade()
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .listener(requestListener)
                 .into(holder.mImageView);
     }

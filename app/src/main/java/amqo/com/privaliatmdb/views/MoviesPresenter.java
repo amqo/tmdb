@@ -22,6 +22,7 @@ public class MoviesPresenter implements MoviesContract.Presenter {
     private final SharedPreferences mSharedPreferences;
 
     private Consumer<MoviesConfiguration> mMoviesConfigurationConsumer;
+    private Consumer<Movies> mMoviesConsumer;
 
     private String mImageBaseUrl;
 
@@ -37,30 +38,20 @@ public class MoviesPresenter implements MoviesContract.Presenter {
         mMoviesView = moviesView;
         mSharedPreferences = sharedPreferences;
 
+        initMoviesConsumer();
         initMoviesConfigurationConsumer();
     }
 
     @Override
-    public void getMovies(int page, Consumer<Movies> consumer) {
+    public void getMovies(int page) {
 
         mLoadingConfiguration = false;
 
-        Observable<Movies> moviesObservable = mMoviesEndpoint.getMovies(
-                MoviesEndpoint.API_VERSION,
-                MovieParameterCreator.createPopularMoviesParameters(page));
-
         mMoviesView.setLoading(true);
 
-        moviesObservable
-                .doOnComplete(new Action() {
-                    @Override
-                    public void run() throws Exception {
-                        mMoviesView.setLoading(false);
-                    }
-                })
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(consumer);
+        if (TextUtils.isEmpty(getMovieImagesBaseUrl())) return;
+
+        getMoviesFromPage(page, mMoviesConsumer);
     }
 
     @Override
@@ -94,6 +85,32 @@ public class MoviesPresenter implements MoviesContract.Presenter {
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(mMoviesConfigurationConsumer);
+    }
+
+    private void getMoviesFromPage(int page, Consumer<Movies> consumer) {
+        Observable<Movies> moviesObservable = mMoviesEndpoint.getMovies(
+                MoviesEndpoint.API_VERSION,
+                MovieParameterCreator.createPopularMoviesParameters(page));
+
+        moviesObservable
+                .doOnComplete(new Action() {
+                    @Override
+                    public void run() throws Exception {
+                        mMoviesView.setLoading(false);
+                    }
+                })
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(consumer);
+    }
+
+    private void initMoviesConsumer() {
+        mMoviesConsumer = new Consumer<Movies>() {
+            @Override
+            public void accept(Movies movies) throws Exception {
+                mMoviesView.onMoviesLoaded(movies);
+            }
+        };
     }
 
     private void initMoviesConfigurationConsumer() {

@@ -1,7 +1,5 @@
 package amqo.com.privaliatmdb.model;
 
-import io.reactivex.functions.Consumer;
-
 public interface MoviesContract {
 
     interface View {
@@ -9,10 +7,11 @@ public interface MoviesContract {
         void setLoading(boolean loading);
         void onMovieInteraction(Movie movie);
         int getScreenDensity();
+        void onMoviesLoaded(Movies movies);
     }
 
     interface Presenter {
-        void getMovies(int page, Consumer<Movies> consumer);
+        void getMovies(int page);
         void updateMoviesConfiguration();
         String getMovieImagesBaseUrl();
     }

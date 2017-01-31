@@ -5,8 +5,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -20,13 +18,19 @@ import javax.inject.Inject;
 import amqo.com.privaliatmdb.MoviesApplication;
 import amqo.com.privaliatmdb.R;
 import amqo.com.privaliatmdb.model.Movie;
+import amqo.com.privaliatmdb.model.Movies;
+import amqo.com.privaliatmdb.model.MoviesAdapterContract;
 import amqo.com.privaliatmdb.model.MoviesContract;
+import amqo.com.privaliatmdb.model.MoviesScrollContract;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MoviesFragment extends Fragment implements MoviesContract.View {
+public class MoviesFragment extends Fragment
+        implements MoviesContract.View, MoviesScrollContract.View {
 
     @Inject MoviesContract.Presenter mMoviesPresenter;
+    @Inject RecyclerView.LayoutManager mLayoutManager;
+    @Inject MoviesAdapterContract.View mMoviesAdapter;
 
     @BindView(R.id.list_refresh)
     SwipeRefreshLayout mSwipeRefreshLayout;
@@ -35,10 +39,8 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
     @BindView(R.id.up_fab)
     FloatingActionButton mUpFAB;
 
-    private MoviesRecyclerViewAdapter mMoviesRecyclerViewAdapter;
     private boolean mIsLoading = false;
-
-    private int mColumnCount = 1;
+    private boolean mIsRefreshing = false;
 
     public MoviesFragment() {
     }
@@ -46,26 +48,9 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         View view = inflater.inflate(R.layout.fragment_movies, container, false);
-
         ButterKnife.bind(this, view);
-
-        initRecyclerView();
-
-        mUpFAB.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mUpFAB.setVisibility(View.GONE);
-                mRecyclerView.scrollToPosition(0);
-            }
-        });
-        mSwipeRefreshLayout.setOnRefreshListener(
-                new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                refreshMovies();
-            }
-        });
 
         return view;
     }
@@ -76,27 +61,44 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
 
         MoviesApplication.getInstance().getMainActivityComponent().inject(this);
 
-        mMoviesRecyclerViewAdapter = new MoviesRecyclerViewAdapter(
-                this, mMoviesPresenter);
-        mRecyclerView.setAdapter(mMoviesRecyclerViewAdapter);
+        initRecyclerView();
+
+        initOtherViews();
+
+        mRecyclerView.setAdapter((RecyclerView.Adapter) mMoviesAdapter);
+        mMoviesPresenter.getMovies(1);
     }
 
     @Override
     public void refreshMovies() {
         setLoading(true);
-        mMoviesRecyclerViewAdapter.refreshMovies();
+        mIsRefreshing = true;
+        mMoviesPresenter.getMovies(1);
     }
 
     @Override
     public void setLoading(boolean loading) {
-        // TODO show or hide refresh layout
         mIsLoading = loading;
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mSwipeRefreshLayout.setRefreshing(mIsLoading);
-            }
-        });
+        if (getActivity() == null) return;
+        if (getActivity()!= null) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mSwipeRefreshLayout.setRefreshing(mIsLoading);
+                }
+            });
+        }
+    }
+
+    @Override
+    public boolean isLoading() {
+        return mIsLoading;
+    }
+
+    @Override
+    public void loadMoreMovies() {
+        int lastPageLoaded = mMoviesAdapter.getLastPageLoaded();
+        mMoviesPresenter.getMovies(lastPageLoaded + 1);
     }
 
     @Override
@@ -113,60 +115,59 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
         return (int)metrics.xdpi;
     }
 
+    @Override
+    public void onMoviesLoaded(Movies movies) {
+        if (mIsRefreshing) {
+            mIsRefreshing = false;
+            mMoviesAdapter.refreshMovies(movies);
+        } else mMoviesAdapter.addMovies(movies);
+    }
+
+    @Override
+    public void setUpFABVisibility(final int visibility) {
+        if (getActivity() == null) return;
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mUpFAB.setVisibility(visibility);
+            }
+        });
+    }
+
+    @Override
+    public boolean isUpFABVisible() {
+        return mUpFAB.getVisibility() == View.VISIBLE;
+    }
+
+    @Override
+    public RecyclerView.LayoutManager getLayoutManager() {
+        return mLayoutManager;
+    }
+
     private void initRecyclerView() {
 
-        final RecyclerView.LayoutManager layoutManager;
-        if (mColumnCount <= 1) {
-            layoutManager = new LinearLayoutManager(getContext());
-            mRecyclerView.setLayoutManager(layoutManager);
-        } else {
-            layoutManager = new GridLayoutManager(getContext(), mColumnCount);
-            mRecyclerView.setLayoutManager(layoutManager);
-        }
+        mRecyclerView.setLayoutManager(mLayoutManager);
 
         RecyclerView.OnScrollListener mScrollListener =
-                new MoviesScrollListener(layoutManager);
+                new MoviesScrollListener(this);
         mRecyclerView.addOnScrollListener(mScrollListener);
     }
 
-    private class MoviesScrollListener extends RecyclerView.OnScrollListener {
-
-        private final int THREESHOLD = 2;
-
-        private RecyclerView.LayoutManager layoutManager;
-
-        public MoviesScrollListener(RecyclerView.LayoutManager layoutManager) {
-            this.layoutManager = layoutManager;
-        }
-
-        @Override
-        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-            super.onScrolled(recyclerView, dx, dy);
-
-            if (mIsLoading)
-                return;
-            int visibleItemCount = layoutManager.getChildCount();
-            int totalItemCount = layoutManager.getItemCount();
-
-            int pastVisibleItems = 0;
-            if (layoutManager instanceof LinearLayoutManager)
-                pastVisibleItems = ((LinearLayoutManager)layoutManager)
-                        .findFirstVisibleItemPosition();
-            if (layoutManager instanceof GridLayoutManager)
-                pastVisibleItems = ((GridLayoutManager)layoutManager)
-                        .findFirstVisibleItemPosition();
-
-            if (dy < 0 && mUpFAB.getVisibility() == View.GONE && pastVisibleItems > THREESHOLD) {
-                mUpFAB.setVisibility(View.VISIBLE);
-            } else if ((dy >= 0 || pastVisibleItems < THREESHOLD + 1) &&
-                    mUpFAB.getVisibility() == View.VISIBLE) {
+    private void initOtherViews() {
+        mUpFAB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
                 mUpFAB.setVisibility(View.GONE);
+                mRecyclerView.scrollToPosition(0);
             }
+        });
 
-            if (pastVisibleItems + visibleItemCount >= totalItemCount - THREESHOLD) {
-                mMoviesRecyclerViewAdapter.getMoreMovies();
-                mIsLoading = true;
-            }
-        }
+        mSwipeRefreshLayout.setOnRefreshListener(
+                new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+                        refreshMovies();
+                    }
+                });
     }
 }

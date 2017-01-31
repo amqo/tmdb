@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">PrivaliaTMDB</string>
+    <string name="title">Popular Movies</string>
 </resources>

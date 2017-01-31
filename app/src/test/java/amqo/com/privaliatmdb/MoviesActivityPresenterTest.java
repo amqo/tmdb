@@ -17,9 +17,9 @@ import amqo.com.privaliatmdb.model.MoviesContract;
 import amqo.com.privaliatmdb.network.MoviesEndpoint;
 import amqo.com.privaliatmdb.views.MoviesPresenter;
 import io.reactivex.Observable;
-import io.reactivex.functions.Consumer;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
@@ -28,7 +28,7 @@ import static org.mockito.Mockito.verify;
 public class MoviesActivityPresenterTest {
 
     @Mock
-    private MoviesEndpoint mMoviesEndpointInterfaceMock;
+    private MoviesEndpoint mMoviesEndpointMock;
 
     @Mock
     private Observable<Movies> mObservableMoviesMock;
@@ -46,7 +46,7 @@ public class MoviesActivityPresenterTest {
     @Before
     public void setUp() {
         mMoviesActivityPresenter = new MoviesPresenter(
-                mMoviesEndpointInterfaceMock,
+                mMoviesEndpointMock,
                 mMoviesViewMock,
                 mSharedPreferencesMock);
     }
@@ -54,20 +54,15 @@ public class MoviesActivityPresenterTest {
     @Test
     public void getMovies_callCorrectMethods() {
 
-        Consumer<Movies> consumer = new Consumer<Movies>() {
-            @Override
-            public void accept(Movies movies) throws Exception { }
-        };
-
         doAnswer(new Answer() {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
                 return mObservableMoviesMock;
             }
-        }).when(mMoviesEndpointInterfaceMock).getMovies(any(Integer.class), any(Map.class));
-        mMoviesActivityPresenter.getMovies(DEFAULT_PAGE, consumer);
+        }).when(mMoviesEndpointMock).getMovies(any(Integer.class), any(Map.class));
+        mMoviesActivityPresenter.getMovies(DEFAULT_PAGE);
 
-        verify(mMoviesEndpointInterfaceMock).getMovies(any(Integer.class), any(Map.class));
+        verify(mMoviesEndpointMock).getMovies(any(Integer.class), any(Map.class));
         verify(mMoviesViewMock).setLoading(true);
     }
 
@@ -84,15 +79,13 @@ public class MoviesActivityPresenterTest {
                          assertEquals(parameters.size(), 4);
                          assertEquals(parameters.get("page"), Integer.toString(DEFAULT_PAGE));
                          assertEquals(parameters.get("sort_by"), "popularity.desc");
+                         assertFalse(parameters.get("language").isEmpty());
 
                          return mObservableMoviesMock;
                      }
                  }
-        ).when(mMoviesEndpointInterfaceMock).getMovies(any(Integer.class), any(Map.class));
-        mMoviesActivityPresenter.getMovies(DEFAULT_PAGE, new Consumer<Movies>() {
-            @Override
-            public void accept(Movies movies) throws Exception { }
-        });
+        ).when(mMoviesEndpointMock).getMovies(any(Integer.class), any(Map.class));
+        mMoviesActivityPresenter.getMovies(DEFAULT_PAGE);
     }
 
     @Test
@@ -109,11 +102,8 @@ public class MoviesActivityPresenterTest {
                          return mObservableMoviesMock;
                      }
                  }
-        ).when(mMoviesEndpointInterfaceMock).getMovies(any(Integer.class), any(Map.class));
-        mMoviesActivityPresenter.getMovies(secondPage, new Consumer<Movies>() {
-            @Override
-            public void accept(Movies movies) throws Exception { }
-        });
+        ).when(mMoviesEndpointMock).getMovies(any(Integer.class), any(Map.class));
+        mMoviesActivityPresenter.getMovies(secondPage);
     }
 
 }

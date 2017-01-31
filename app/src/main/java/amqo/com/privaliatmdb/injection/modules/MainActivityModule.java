@@ -27,8 +27,9 @@ public class MainActivityModule {
                 mMainActivity.getSupportFragmentManager().findFragmentById(R.id.fragment);
         return moviesFragment;
     }
+
     @Provides @PerFragment
-    MoviesContract.Presenter provicesMoviesPresenter(
+    MoviesContract.Presenter providesMoviesPresenter(
             MoviesEndpoint moviesEndpoint,
             SharedPreferences sharedPreferences,
             MoviesContract.View moviesView) {

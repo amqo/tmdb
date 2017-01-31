@@ -21,8 +21,13 @@
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
             app:contentScrim="?attr/colorPrimary"
-            app:title="Popular Movies"
+            app:title="@string/title"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/cinema" />
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
@@ -43,6 +48,6 @@
         android:layout_margin="@dimen/fab_margin"
         app:layout_anchor="@id/app_bar"
         app:layout_anchorGravity="bottom|end"
-        app:srcCompat="@android:drawable/ic_dialog_email" />
+        app:srcCompat="@drawable/ic_search" />
 
 </android.support.design.widget.CoordinatorLayout>
