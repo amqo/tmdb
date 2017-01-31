@@ -6,7 +6,7 @@ public interface MoviesScrollContract {
 
     interface View {
 
-        void setUpFABVisibility(int visibility);
+        void setShownUpFAB(boolean show);
         boolean isUpFABVisible();
         RecyclerView.LayoutManager getLayoutManager();
         boolean isLoading();

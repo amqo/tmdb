@@ -3,7 +3,6 @@ package amqo.com.privaliatmdb.views.popular;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.View;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -67,7 +66,7 @@ public class MoviesScrollListener extends RecyclerView.OnScrollListener {
         // or reach a top item position, make FAB gone automatically
         if ((!mScrollingUp || pastItems < THRESHOLD + 1) &&
                 mMoviesScrollView.isUpFABVisible()) {
-            mMoviesScrollView.setUpFABVisibility(View.GONE);
+            mMoviesScrollView.setShownUpFAB(false);
         }
 
         // If no change in scroll direction, keep FAB visibility
@@ -80,7 +79,7 @@ public class MoviesScrollListener extends RecyclerView.OnScrollListener {
                 // If scrolling up and FAB is not already visible, and not in top item position,
                 // then make FAB visible, unless a change in scroll direction occurs before timer delay
                 if (mScrollingUp && !mMoviesScrollView.isUpFABVisible() && pastItems > THRESHOLD) {
-                    mMoviesScrollView.setUpFABVisibility(View.VISIBLE);
+                    mMoviesScrollView.setShownUpFAB(true);
                 }
             }
         }, TIMER_DELAY);

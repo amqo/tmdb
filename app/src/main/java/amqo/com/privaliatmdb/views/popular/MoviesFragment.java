@@ -124,19 +124,20 @@ public class MoviesFragment extends Fragment
     }
 
     @Override
-    public void setUpFABVisibility(final int visibility) {
+    public void setShownUpFAB(final boolean show) {
         if (getActivity() == null) return;
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mUpFAB.setVisibility(visibility);
+                if (show) mUpFAB.show();
+                else mUpFAB.hide();
             }
         });
     }
 
     @Override
     public boolean isUpFABVisible() {
-        return mUpFAB.getVisibility() == View.VISIBLE;
+        return mUpFAB.isShown();
     }
 
     @Override
@@ -157,7 +158,7 @@ public class MoviesFragment extends Fragment
         mUpFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mUpFAB.setVisibility(View.GONE);
+                mUpFAB.hide();
                 mRecyclerView.scrollToPosition(0);
             }
         });
