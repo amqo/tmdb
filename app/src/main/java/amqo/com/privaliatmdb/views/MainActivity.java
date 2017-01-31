@@ -5,6 +5,7 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -13,6 +14,7 @@ import android.view.View;
 
 import amqo.com.privaliatmdb.MoviesApplication;
 import amqo.com.privaliatmdb.R;
+import amqo.com.privaliatmdb.views.popular.MoviesFragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -41,8 +43,17 @@ public class MainActivity extends AppCompatActivity {
 
         setSupportActionBar(mToolbar);
 
-        MoviesApplication.getInstance().createMainActivityComponent(this);
+        MoviesFragment moviesFragment = (MoviesFragment)
+                getSupportFragmentManager().findFragmentById(R.id.contentFrame);
+        if (moviesFragment == null) {
+            moviesFragment = MoviesFragment.newInstance();
 
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.add(R.id.contentFrame, moviesFragment);
+            transaction.commit();
+        }
+
+        MoviesApplication.getInstance().createMainActivityComponent(moviesFragment);
 
         initViews();
     }

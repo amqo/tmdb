@@ -10,14 +10,8 @@
     tools:showIn="@layout/activity_main">
 
     <FrameLayout
+        android:id="@+id/contentFrame"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <fragment
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:name="amqo.com.privaliatmdb.views.popular.MoviesFragment"
-            android:id="@+id/fragment" />
-    </FrameLayout>
+        android:layout_height="wrap_content" />
 
 </LinearLayout>

@@ -4,10 +4,10 @@ import android.app.Application;
 
 import amqo.com.privaliatmdb.injection.ApplicationComponent;
 import amqo.com.privaliatmdb.injection.DaggerApplicationComponent;
-import amqo.com.privaliatmdb.injection.MainActivityComponent;
+import amqo.com.privaliatmdb.injection.MoviesComponent;
 import amqo.com.privaliatmdb.injection.modules.ApplicationModule;
-import amqo.com.privaliatmdb.injection.modules.MainActivityModule;
-import amqo.com.privaliatmdb.views.MainActivity;
+import amqo.com.privaliatmdb.injection.modules.MoviesModule;
+import amqo.com.privaliatmdb.views.popular.MoviesFragment;
 
 public class MoviesApplication extends Application {
 
@@ -15,7 +15,7 @@ public class MoviesApplication extends Application {
 
     private ApplicationComponent mApplicationComponent;
 
-    private MainActivityComponent mMainActivityComponent;
+    private MoviesComponent mMoviesComponent;
 
     public static MoviesApplication getInstance() {
         return INSTANCE;
@@ -32,16 +32,16 @@ public class MoviesApplication extends Application {
                 .build();
     }
 
-    public void createMainActivityComponent(MainActivity activity) {
-        mMainActivityComponent = mApplicationComponent.getMainActivityComponent(
-                new MainActivityModule(activity));
+    public void createMainActivityComponent(MoviesFragment fragment) {
+        mMoviesComponent = mApplicationComponent.getMoviesComponent(
+                new MoviesModule(fragment));
     }
 
-    public MainActivityComponent getMainActivityComponent() {
-        return mMainActivityComponent;
+    public MoviesComponent getMainActivityComponent() {
+        return mMoviesComponent;
     }
 
     public void releaseMainActivityComponent() {
-        mMainActivityComponent = null;
+        mMoviesComponent = null;
     }
 }

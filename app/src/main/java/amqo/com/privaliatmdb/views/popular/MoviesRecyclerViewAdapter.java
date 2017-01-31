@@ -17,6 +17,8 @@ import com.bumptech.glide.request.target.Target;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import amqo.com.privaliatmdb.MoviesApplication;
 import amqo.com.privaliatmdb.R;
 import amqo.com.privaliatmdb.model.Movie;
@@ -35,6 +37,7 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecycl
 
     private Movies mLastReceivedMovies;
 
+    @Inject
     public MoviesRecyclerViewAdapter(
             MoviesContract.View moviesView,
             MoviesContract.Presenter presenter) {

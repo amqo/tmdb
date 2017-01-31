@@ -7,21 +7,30 @@ import android.support.v7.widget.RecyclerView;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import javax.inject.Inject;
+
+import amqo.com.privaliatmdb.MoviesApplication;
+import amqo.com.privaliatmdb.R;
 import amqo.com.privaliatmdb.model.MoviesScrollContract;
 
 public class MoviesScrollListener extends RecyclerView.OnScrollListener {
 
-    private final int THRESHOLD = 2;
     private final int TIMER_DELAY = 500;
+
+    private final MoviesScrollContract.View mMoviesScrollView;
+    private final int THRESHOLD;
 
     private Timer mShowFabTimer;
 
     private boolean mScrollingUp = false;
 
-    private MoviesScrollContract.View mMoviesScrollView;
-
+    @Inject
     public MoviesScrollListener(
+            MoviesApplication context,
             MoviesScrollContract.View moviesScrollView) {
+
+        THRESHOLD = context.getResources().getInteger(R.integer.grid_columns) * 2;
+
         mMoviesScrollView = moviesScrollView;
     }
 

@@ -6,12 +6,9 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
-import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 
 import javax.inject.Inject;
 
@@ -19,9 +16,9 @@ import amqo.com.privaliatmdb.MoviesApplication;
 import amqo.com.privaliatmdb.R;
 import amqo.com.privaliatmdb.model.Movie;
 import amqo.com.privaliatmdb.model.Movies;
-import amqo.com.privaliatmdb.model.MoviesAdapterContract;
 import amqo.com.privaliatmdb.model.MoviesContract;
 import amqo.com.privaliatmdb.model.MoviesScrollContract;
+import amqo.com.privaliatmdb.views.utils.ScreenHelper;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -30,7 +27,11 @@ public class MoviesFragment extends Fragment
 
     @Inject MoviesContract.Presenter mMoviesPresenter;
     @Inject RecyclerView.LayoutManager mLayoutManager;
-    @Inject MoviesAdapterContract.View mMoviesAdapter;
+
+    // Here the injection is for the implementation of the Contracts
+    // This is to make constructor injection work
+    @Inject MoviesRecyclerViewAdapter mMoviesAdapter;
+    @Inject MoviesScrollListener mScrollListener;
 
     @BindView(R.id.list_refresh)
     SwipeRefreshLayout mSwipeRefreshLayout;
@@ -42,7 +43,15 @@ public class MoviesFragment extends Fragment
     private boolean mIsLoading = false;
     private boolean mIsRefreshing = false;
 
-    public MoviesFragment() {
+    public static MoviesFragment newInstance() {
+        return new MoviesFragment();
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        MoviesApplication.getInstance().getMainActivityComponent().inject(this);
     }
 
     @Override
@@ -52,21 +61,13 @@ public class MoviesFragment extends Fragment
         View view = inflater.inflate(R.layout.fragment_movies, container, false);
         ButterKnife.bind(this, view);
 
-        return view;
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        MoviesApplication.getInstance().getMainActivityComponent().inject(this);
-
         initRecyclerView();
 
         initOtherViews();
 
-        mRecyclerView.setAdapter((RecyclerView.Adapter) mMoviesAdapter);
         mMoviesPresenter.getMovies(1);
+
+        return view;
     }
 
     @Override
@@ -108,11 +109,7 @@ public class MoviesFragment extends Fragment
 
     @Override
     public int getScreenDensity() {
-        WindowManager windowManager = getActivity().getWindowManager();
-        Display display = windowManager.getDefaultDisplay();
-        DisplayMetrics metrics = new DisplayMetrics();
-        display.getMetrics(metrics);
-        return (int)metrics.xdpi;
+        return ScreenHelper.getScreenDensity(getActivity());
     }
 
     @Override
@@ -148,10 +145,8 @@ public class MoviesFragment extends Fragment
     private void initRecyclerView() {
 
         mRecyclerView.setLayoutManager(mLayoutManager);
-
-        RecyclerView.OnScrollListener mScrollListener =
-                new MoviesScrollListener(this);
         mRecyclerView.addOnScrollListener(mScrollListener);
+        mRecyclerView.setAdapter((RecyclerView.Adapter) mMoviesAdapter);
     }
 
     private void initOtherViews() {

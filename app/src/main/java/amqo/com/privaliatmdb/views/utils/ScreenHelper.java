@@ -1,5 +1,10 @@
 package amqo.com.privaliatmdb.views.utils;
 
+import android.app.Activity;
+import android.util.DisplayMetrics;
+import android.view.Display;
+import android.view.WindowManager;
+
 import amqo.com.privaliatmdb.model.MoviesConfiguration;
 import amqo.com.privaliatmdb.model.MoviesContract;
 
@@ -25,5 +30,13 @@ public abstract class ScreenHelper {
             }
         }
         return imageSize;
+    }
+
+    public static int getScreenDensity(Activity activity) {
+        WindowManager windowManager = activity.getWindowManager();
+        Display display = windowManager.getDefaultDisplay();
+        DisplayMetrics metrics = new DisplayMetrics();
+        display.getMetrics(metrics);
+        return (int)metrics.xdpi;
     }
 }

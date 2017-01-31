@@ -1,15 +1,18 @@
 package amqo.com.privaliatmdb.injection.modules;
 
+import android.content.SharedPreferences;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 import amqo.com.privaliatmdb.MoviesApplication;
+import amqo.com.privaliatmdb.R;
 import amqo.com.privaliatmdb.injection.scopes.PerFragment;
-import amqo.com.privaliatmdb.model.MoviesAdapterContract;
 import amqo.com.privaliatmdb.model.MoviesContract;
+import amqo.com.privaliatmdb.model.MoviesScrollContract;
 import amqo.com.privaliatmdb.network.MoviesEndpoint;
-import amqo.com.privaliatmdb.views.popular.MoviesRecyclerViewAdapter;
+import amqo.com.privaliatmdb.views.MoviesPresenter;
+import amqo.com.privaliatmdb.views.popular.MoviesFragment;
 import dagger.Module;
 import dagger.Provides;
 import retrofit2.Retrofit;
@@ -17,7 +20,11 @@ import retrofit2.Retrofit;
 @Module
 public class MoviesModule {
 
-    private int mColumnCount = 1;
+    private MoviesFragment mMoviesFragment;
+
+    public MoviesModule(MoviesFragment fragment) {
+        mMoviesFragment = fragment;
+    }
 
     @Provides @PerFragment
     MoviesEndpoint providesMoviesEndpoint(Retrofit retrofit) {
@@ -27,20 +34,32 @@ public class MoviesModule {
     @Provides @PerFragment
     RecyclerView.LayoutManager providesLayoutManager(MoviesApplication context) {
 
+        int gridColumns = context.getResources().getInteger(R.integer.grid_columns);
+
         RecyclerView.LayoutManager layoutManager;
-        if (mColumnCount <= 1)
+        if (gridColumns <= 1)
             layoutManager = new LinearLayoutManager(context);
-        else layoutManager = new GridLayoutManager(context, mColumnCount);
+        else layoutManager = new GridLayoutManager(context, gridColumns);
 
         return layoutManager;
     }
 
     @Provides @PerFragment
-    MoviesAdapterContract.View providesMoviesAdapter(
-            MoviesContract.View moviesView,
-            MoviesContract.Presenter moviesPresenter) {
-
-        return new MoviesRecyclerViewAdapter(moviesView, moviesPresenter);
+    MoviesContract.View providesMoviesView() {
+        return mMoviesFragment;
     }
 
+    @Provides @PerFragment
+    MoviesScrollContract.View providesMoviesScrollView() {
+        return mMoviesFragment;
+    }
+
+    @Provides @PerFragment
+    MoviesContract.Presenter providesMoviesPresenter(
+            MoviesEndpoint moviesEndpoint,
+            SharedPreferences sharedPreferences,
+            MoviesContract.View moviesView) {
+
+        return new MoviesPresenter(moviesEndpoint, moviesView, sharedPreferences);
+    }
 }
