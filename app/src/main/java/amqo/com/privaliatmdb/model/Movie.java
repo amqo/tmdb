@@ -16,6 +16,9 @@ public class Movie {
     @SerializedName("release_date")
     private String mReleaseDate;
 
+    @SerializedName("vote_average")
+    private float mVoteAverage;
+
     public String getPosterPath(String basePath) {
         String posterUrl = basePath + mPosterPath;
         return posterUrl;
@@ -36,5 +39,9 @@ public class Movie {
     private String getReleaseYear() {
         return mReleaseDate.isEmpty() ?
                 "" : mReleaseDate.substring(0, 4);
+    }
+
+    public float getVoteAverage() {
+        return mVoteAverage;
     }
 }

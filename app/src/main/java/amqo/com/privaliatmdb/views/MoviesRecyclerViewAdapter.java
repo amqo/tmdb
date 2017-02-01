@@ -104,7 +104,8 @@ public class MoviesRecyclerViewAdapter
         return mLastReceivedMovies.getPage();
     }
 
-    private void loadImageForMovie(final ViewHolder holder, Movie movie) {
+    private void loadImageForMovie(final ViewHolder holder, final Movie movie) {
+
         String movieImagesBaseUrl = mMoviesPresenter.getMovieImagesBaseUrl();
         if (TextUtils.isEmpty(movieImagesBaseUrl)) return;
 
@@ -114,7 +115,7 @@ public class MoviesRecyclerViewAdapter
                     public boolean onException(
                             Exception e, String model, Target<GlideDrawable> target,
                             boolean isFirstResource) {
-                        holder.mImageView.setVisibility(View.GONE);
+                        holder.mImageContainerView.setVisibility(View.GONE);
                         // Get configuration again, as this error should occur if configuration changed in the API
                         mMoviesPresenter.updateMoviesConfiguration();
                         return false;
@@ -125,6 +126,11 @@ public class MoviesRecyclerViewAdapter
                             GlideDrawable resource, String model,
                             Target<GlideDrawable> target, boolean isFromMemoryCache,
                             boolean isFirstResource) {
+                        float rating = movie.getVoteAverage();
+                        if (rating != 0.0) {
+                            holder.mRatingMovieView.setRating(Float.toString(rating));
+                            holder.mRatingMovieView.setVisibility(View.VISIBLE);
+                        }
                         return false;
                     }
                 };
@@ -155,6 +161,8 @@ public class MoviesRecyclerViewAdapter
             holder.mImageView.setLayoutParams(params);
         }
 
+        holder.mRatingMovieView.setVisibility(View.GONE);
+
         DrawableRequestBuilder builder = Glide.with(MoviesApplication.getInstance())
                 .load(movie.getPosterPath(movieImagesBaseUrl))
                 .crossFade()
@@ -175,12 +183,16 @@ public class MoviesRecyclerViewAdapter
 
         @BindView(R.id.image)
         public ImageView mImageView;
+        @BindView(R.id.image_container)
+        public View mImageContainerView;
         @BindView(R.id.title)
         public TextView mTitleView;
         @BindView(R.id.title_rank)
         public TextView mTitleRankView;
         @BindView(R.id.overview)
         public TextView mOverView;
+        @BindView(R.id.image_rating)
+        RatingMovieView mRatingMovieView;
 
         public Movie mItem;
 
