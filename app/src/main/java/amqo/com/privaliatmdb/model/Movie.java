@@ -17,7 +17,8 @@ public class Movie {
     private String mReleaseDate;
 
     public String getPosterPath(String basePath) {
-        return basePath + mPosterPath;
+        String posterUrl = basePath + mPosterPath;
+        return posterUrl;
     }
 
     public String getOverview() {

@@ -8,7 +8,7 @@ import java.util.List;
 
 public class MoviesConfigurationImages {
 
-    @SerializedName("base_url")
+    @SerializedName("secure_base_url")
     private String mBaseUrl;
 
     @SerializedName("poster_sizes")

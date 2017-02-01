@@ -15,7 +15,7 @@ import java.util.Map;
 import amqo.com.privaliatmdb.model.Movies;
 import amqo.com.privaliatmdb.model.MoviesContract;
 import amqo.com.privaliatmdb.network.MoviesEndpoint;
-import amqo.com.privaliatmdb.views.MoviesPresenter;
+import amqo.com.privaliatmdb.views.popular.MoviesPresenter;
 import io.reactivex.Observable;
 
 import static junit.framework.Assert.assertEquals;

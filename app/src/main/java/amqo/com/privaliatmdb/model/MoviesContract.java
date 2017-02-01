@@ -17,10 +17,18 @@ public interface MoviesContract {
 
     interface Presenter {
 
-        void getMovies(int page);
-
         void updateMoviesConfiguration();
 
         String getMovieImagesBaseUrl();
+    }
+
+    interface PresenterPopular extends  Presenter{
+
+        void getMovies(int page);
+    }
+
+    interface PresenterSearch extends  Presenter{
+
+        void searchMovies(int page, String query);
     }
 }

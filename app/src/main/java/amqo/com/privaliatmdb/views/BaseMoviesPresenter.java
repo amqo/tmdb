@@ -11,51 +11,24 @@ import amqo.com.privaliatmdb.network.MoviesEndpoint;
 import amqo.com.privaliatmdb.views.utils.ScreenHelper;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
-public class MoviesPresenter implements MoviesContract.Presenter {
+public abstract class BaseMoviesPresenter {
 
-    private final MoviesEndpoint mMoviesEndpoint;
-    private final MoviesContract.View mMoviesView;
-    private final SharedPreferences mSharedPreferences;
+    protected MoviesEndpoint mMoviesEndpoint;
+    protected MoviesContract.View mMoviesView;
+    protected SharedPreferences mSharedPreferences;
 
-    private Consumer<MoviesConfiguration> mMoviesConfigurationConsumer;
-    private Consumer<Movies> mMoviesConsumer;
+    protected Consumer<MoviesConfiguration> mMoviesConfigurationConsumer;
+    protected Consumer<Movies> mMoviesConsumer;
 
-    private String mImageBaseUrl;
+    protected String mImageBaseUrl;
 
-    private boolean mLoadingConfiguration = false;
-    private boolean mConfigurationLoaded = false;
+    protected boolean mLoadingConfiguration = false;
+    protected boolean mConfigurationLoaded = false;
 
-    public MoviesPresenter(
-            MoviesEndpoint moviesEndpoint,
-            MoviesContract.View moviesView,
-            SharedPreferences sharedPreferences) {
-
-        mMoviesEndpoint = moviesEndpoint;
-        mMoviesView = moviesView;
-        mSharedPreferences = sharedPreferences;
-
-        initMoviesConsumer();
-        initMoviesConfigurationConsumer();
-    }
-
-    @Override
-    public void getMovies(int page) {
-
-        mLoadingConfiguration = false;
-
-        mMoviesView.setLoading(true);
-
-        if (TextUtils.isEmpty(getMovieImagesBaseUrl())) return;
-
-        getMoviesFromPage(page, mMoviesConsumer);
-    }
-
-    @Override
-    public String getMovieImagesBaseUrl() {
+    protected String getMovieImagesBaseUrl() {
 
         if (!TextUtils.isEmpty(mImageBaseUrl))
             return mImageBaseUrl;
@@ -70,8 +43,7 @@ public class MoviesPresenter implements MoviesContract.Presenter {
         return mImageBaseUrl;
     }
 
-    @Override
-    public void updateMoviesConfiguration() {
+    protected void updateMoviesConfiguration() {
 
         if (mLoadingConfiguration || mConfigurationLoaded) return;
         mLoadingConfiguration = true;
@@ -87,24 +59,7 @@ public class MoviesPresenter implements MoviesContract.Presenter {
                 .subscribe(mMoviesConfigurationConsumer);
     }
 
-    private void getMoviesFromPage(int page, Consumer<Movies> consumer) {
-        Observable<Movies> moviesObservable = mMoviesEndpoint.getMovies(
-                MoviesEndpoint.API_VERSION,
-                MovieParameterCreator.createPopularMoviesParameters(page));
-
-        moviesObservable
-                .doOnComplete(new Action() {
-                    @Override
-                    public void run() throws Exception {
-                        mMoviesView.setLoading(false);
-                    }
-                })
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(consumer);
-    }
-
-    private void initMoviesConsumer() {
+    protected void initMoviesConsumer() {
         mMoviesConsumer = new Consumer<Movies>() {
             @Override
             public void accept(Movies movies) throws Exception {
@@ -113,7 +68,7 @@ public class MoviesPresenter implements MoviesContract.Presenter {
         };
     }
 
-    private void initMoviesConfigurationConsumer() {
+    protected void initMoviesConfigurationConsumer() {
         mMoviesConfigurationConsumer = new Consumer<MoviesConfiguration>() {
             @Override
             public void accept(MoviesConfiguration moviesConfiguration) throws Exception {

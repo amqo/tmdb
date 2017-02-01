@@ -1,7 +1,6 @@
 package amqo.com.privaliatmdb.views.popular;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -16,9 +15,9 @@ import amqo.com.privaliatmdb.MoviesApplication;
 import amqo.com.privaliatmdb.R;
 import amqo.com.privaliatmdb.model.Movie;
 import amqo.com.privaliatmdb.model.Movies;
+import amqo.com.privaliatmdb.model.MoviesAdapterContract;
 import amqo.com.privaliatmdb.model.MoviesContract;
 import amqo.com.privaliatmdb.model.MoviesScrollContract;
-import amqo.com.privaliatmdb.views.MoviesRecyclerViewAdapter;
 import amqo.com.privaliatmdb.views.utils.ScreenHelper;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -26,12 +25,12 @@ import butterknife.ButterKnife;
 public class MoviesFragment extends Fragment
         implements MoviesContract.View, MoviesScrollContract.FabView {
 
-    @Inject MoviesContract.Presenter mMoviesPresenter;
+    @Inject MoviesContract.PresenterPopular mMoviesPresenter;
     @Inject RecyclerView.LayoutManager mLayoutManager;
+    @Inject MoviesAdapterContract.View mMoviesAdapter;
 
     // Here the injection is for the implementation of the Contracts
     // This is to make constructor injection work
-    @Inject MoviesRecyclerViewAdapter mMoviesAdapter;
     @Inject MoviesScrollListener mScrollListener;
 
     @BindView(R.id.list_refresh)
@@ -49,18 +48,13 @@ public class MoviesFragment extends Fragment
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        MoviesApplication.getInstance().getMoviesComponent().inject(this);
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_movies, container, false);
         ButterKnife.bind(this, view);
+
+        MoviesApplication.getInstance().getMoviesComponent().inject(this);
 
         initRecyclerView();
 
