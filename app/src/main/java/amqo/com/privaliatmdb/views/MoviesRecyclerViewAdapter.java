@@ -127,8 +127,12 @@ public class MoviesRecyclerViewAdapter
                             Target<GlideDrawable> target, boolean isFromMemoryCache,
                             boolean isFirstResource) {
                         float rating = movie.getVoteAverage();
+                        // Show only movies with rating, 0.0 meaning no ratings (most of the times)
                         if (rating != 0.0) {
-                            holder.mRatingMovieView.setRating(Float.toString(rating));
+                            //Show decimals only when they are different than 0
+                            String rating_s = rating == Math.ceil(rating) ?
+                                    Integer.toString((int)rating) : Float.toString(rating);
+                            holder.mRatingMovieView.setRating(rating_s);
                             holder.mRatingMovieView.setVisibility(View.VISIBLE);
                         }
                         return false;
