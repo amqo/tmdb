@@ -4,4 +4,6 @@
     <string name="title">Películas Populares</string>
     <string name="search_title">Buscar</string>
     <string name="search_hint">Escribe el nombre de la película</string>
+    <string name="title_activity_search">Busca Películas</string>
+    <string name="action_settings">Configuración</string>
 </resources>
