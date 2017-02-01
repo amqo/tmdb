@@ -104,6 +104,12 @@ public class MoviesRecyclerViewAdapter
         return mLastReceivedMovies.getPage();
     }
 
+    @Override
+    public boolean isInLastPage() {
+        if (mLastReceivedMovies == null) return true;
+        return mLastReceivedMovies.getTotalPages() == mLastReceivedMovies.getPage();
+    }
+
     private void loadImageForMovie(final ViewHolder holder, final Movie movie) {
 
         String movieImagesBaseUrl = mMoviesPresenter.getMovieImagesBaseUrl();

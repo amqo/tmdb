@@ -29,7 +29,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
-                android:drawableRight="@drawable/ic_movie_star"
+                android:textColor="@android:color/black"
+                android:drawableRight="@drawable/ic_local_movies"
                 android:gravity="center"
                 android:textStyle="bold" />
 

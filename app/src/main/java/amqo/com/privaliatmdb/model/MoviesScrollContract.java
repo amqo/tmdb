@@ -11,6 +11,8 @@ public interface MoviesScrollContract {
         boolean isLoading();
 
         void loadMoreMovies();
+
+        boolean isInLastPage();
     }
 
     interface FabView extends View {

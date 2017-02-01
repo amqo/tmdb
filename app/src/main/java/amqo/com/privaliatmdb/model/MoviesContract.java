@@ -15,6 +15,11 @@ public interface MoviesContract {
         void onMoviesLoaded(Movies movies);
     }
 
+    interface ViewSearch extends View {
+
+        void refreshMovies(String query);
+    }
+
     interface Presenter {
 
         void updateMoviesConfiguration();
@@ -27,7 +32,7 @@ public interface MoviesContract {
         void getMovies(int page);
     }
 
-    interface PresenterSearch extends  Presenter{
+    interface PresenterSearch extends  Presenter {
 
         void searchMovies(int page, String query);
     }

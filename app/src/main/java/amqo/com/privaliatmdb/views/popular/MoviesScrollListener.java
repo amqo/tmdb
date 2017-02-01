@@ -1,9 +1,7 @@
 package amqo.com.privaliatmdb.views.popular;
 
+import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
-
-import java.util.Timer;
-import java.util.TimerTask;
 
 import javax.inject.Inject;
 
@@ -15,7 +13,8 @@ public class MoviesScrollListener extends BaseScrollListener {
 
     private final int TIMER_DELAY = 500;
 
-    private Timer mShowFabTimer;
+    private Handler mShowFabHandler = new Handler();
+    private Runnable mShowFabRunnable;
 
     private boolean mScrollingUp = false;
 
@@ -49,8 +48,8 @@ public class MoviesScrollListener extends BaseScrollListener {
 
         // If it was a change in scrolling direction, then cancel it,
         // to avoid showing and hiding FAB too frecuently
-        if (mShowFabTimer != null && wasScrollingUp != mScrollingUp) {
-            mShowFabTimer.cancel();
+        if (mShowFabRunnable != null && wasScrollingUp != mScrollingUp) {
+            mShowFabHandler.removeCallbacks(mShowFabRunnable);
         }
 
         // If FAB is visible and is scrolling down,
@@ -63,8 +62,7 @@ public class MoviesScrollListener extends BaseScrollListener {
         // If no change in scroll direction, keep FAB visibility
         if (wasScrollingUp == mScrollingUp) return;
 
-        mShowFabTimer = new Timer();
-        mShowFabTimer.schedule(new TimerTask() {
+        mShowFabRunnable = new Runnable() {
             @Override
             public void run() {
                 // If scrolling up and FAB is not already visible, and not in top item position,
@@ -73,6 +71,7 @@ public class MoviesScrollListener extends BaseScrollListener {
                     mMoviesScrollFabView.setShownUpFAB(true);
                 }
             }
-        }, TIMER_DELAY);
+        };
+        mShowFabHandler.postDelayed(mShowFabRunnable, TIMER_DELAY);
     }
 }

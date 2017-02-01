@@ -30,7 +30,7 @@ public class BaseScrollListener extends RecyclerView.OnScrollListener {
     public void onScrolled(RecyclerView recyclerView, int dx, final int dy) {
         super.onScrolled(recyclerView, dx, dy);
 
-        if (mMoviesScrollView.isLoading())
+        if (mMoviesScrollView.isLoading() || mMoviesScrollView.isInLastPage())
             return;
 
         RecyclerView.LayoutManager layoutManager = mMoviesScrollView.getLayoutManager();

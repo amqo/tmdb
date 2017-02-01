@@ -61,7 +61,7 @@ public class SearchMoviesModule {
     }
 
     @Provides @PerFragment
-    MoviesContract.View providesMoviesView() {
+    MoviesContract.ViewSearch providesMoviesView() {
         return mMoviesFragment;
     }
 
@@ -74,14 +74,14 @@ public class SearchMoviesModule {
     MoviesContract.PresenterSearch providesMoviesPresenter(
             MoviesEndpoint moviesEndpoint,
             SharedPreferences sharedPreferences,
-            MoviesContract.View moviesView) {
+            MoviesContract.ViewSearch moviesView) {
 
         return new SearchMoviesPresenter(moviesEndpoint, moviesView, sharedPreferences);
     }
 
     @Provides @PerFragment
     MoviesAdapterContract.View providesMoviesAdapterView(
-            MoviesContract.View moviesView,
+            MoviesContract.ViewSearch moviesView,
             MoviesContract.PresenterSearch presenter) {
         return new MoviesRecyclerViewAdapter(moviesView, presenter);
     }

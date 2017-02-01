@@ -76,14 +76,12 @@ public class MoviesFragment extends Fragment
     public void setLoading(boolean loading) {
         mIsLoading = loading;
         if (getActivity() == null) return;
-        if (getActivity()!= null) {
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mSwipeRefreshLayout.setRefreshing(mIsLoading);
-                }
-            });
-        }
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mSwipeRefreshLayout.setRefreshing(mIsLoading);
+            }
+        });
     }
 
     @Override
@@ -95,6 +93,11 @@ public class MoviesFragment extends Fragment
     public void loadMoreMovies() {
         int lastPageLoaded = mMoviesAdapter.getLastPageLoaded();
         mMoviesPresenter.getMovies(lastPageLoaded + 1);
+    }
+
+    @Override
+    public boolean isInLastPage() {
+        return mMoviesAdapter.isInLastPage();
     }
 
     @Override
@@ -117,14 +120,8 @@ public class MoviesFragment extends Fragment
 
     @Override
     public void setShownUpFAB(final boolean show) {
-        if (getActivity() == null) return;
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (show) mUpFAB.show();
-                else mUpFAB.hide();
-            }
-        });
+        if (show) mUpFAB.show();
+        else mUpFAB.hide();
     }
 
     @Override

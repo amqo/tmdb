@@ -18,7 +18,7 @@ public class SearchMoviesPresenter extends BaseMoviesPresenter implements Movies
 
     public SearchMoviesPresenter(
             MoviesEndpoint moviesEndpoint,
-            MoviesContract.View moviesView,
+            MoviesContract.ViewSearch moviesView,
             SharedPreferences sharedPreferences) {
 
         mMoviesEndpoint = moviesEndpoint;

@@ -9,5 +9,7 @@ public interface MoviesAdapterContract {
         void addMovies(Movies movies);
 
         int getLastPageLoaded();
+
+        boolean isInLastPage();
     }
 }

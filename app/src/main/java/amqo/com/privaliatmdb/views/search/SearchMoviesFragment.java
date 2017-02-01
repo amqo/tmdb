@@ -36,7 +36,7 @@ import static amqo.com.privaliatmdb.R.id.search;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class SearchMoviesFragment extends Fragment implements MoviesContract.View, MoviesScrollContract.View {
+public class SearchMoviesFragment extends Fragment implements MoviesContract.ViewSearch, MoviesScrollContract.View {
 
     @Inject MoviesContract.PresenterSearch mMoviesPresenter;
     @Inject RecyclerView.LayoutManager mLayoutManager;
@@ -45,6 +45,7 @@ public class SearchMoviesFragment extends Fragment implements MoviesContract.Vie
     // Here the injection is for the implementation of the Contracts
     // This is to make constructor injection work
     @Inject BaseScrollListener mScrollListener;
+    @Inject SearchQueryListener mSearchQueryListener;
 
     @BindView(R.id.list_refresh)
     SwipeRefreshLayout mSwipeRefreshLayout;
@@ -117,19 +118,7 @@ public class SearchMoviesFragment extends Fragment implements MoviesContract.Vie
             mSearchView.setQuery(mCurrentSearchTerm, false);
         }
 
-        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                mCurrentSearchTerm = newText;
-                refreshMovies();
-                return false;
-            }
-        });
+        mSearchView.setOnQueryTextListener(mSearchQueryListener);
 
         MenuItemCompat.setOnActionExpandListener(searchItem, new MenuItemCompat.OnActionExpandListener() {
             @Override
@@ -157,17 +146,22 @@ public class SearchMoviesFragment extends Fragment implements MoviesContract.Vie
     }
 
     @Override
+    public void refreshMovies(String query) {
+        mCurrentSearchTerm = query;
+        refreshMovies();
+    }
+
+    @Override
     public void setLoading(boolean loading) {
         mIsLoading = loading;
         if (getActivity() == null) return;
-        if (getActivity()!= null) {
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mSwipeRefreshLayout.setRefreshing(mIsLoading);
-                }
-            });
-        }
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mSwipeRefreshLayout.setRefreshing(mIsLoading);
+            }
+        });
+
     }
 
     @Override
@@ -202,6 +196,11 @@ public class SearchMoviesFragment extends Fragment implements MoviesContract.Vie
     public void loadMoreMovies() {
         int lastPageLoaded = mMoviesAdapter.getLastPageLoaded();
         mMoviesPresenter.searchMovies(lastPageLoaded + 1, mCurrentSearchTerm);
+    }
+
+    @Override
+    public boolean isInLastPage() {
+        return mMoviesAdapter.isInLastPage();
     }
 
     private void initRecyclerView() {
