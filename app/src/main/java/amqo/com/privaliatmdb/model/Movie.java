@@ -1,5 +1,7 @@
 package amqo.com.privaliatmdb.model;
 
+import android.text.TextUtils;
+
 import com.google.gson.annotations.SerializedName;
 
 public class Movie {
@@ -20,6 +22,7 @@ public class Movie {
     private float mVoteAverage;
 
     public String getPosterPath(String basePath) {
+        if (TextUtils.isEmpty(mPosterPath)) return "";
         String posterUrl = basePath + mPosterPath;
         return posterUrl;
     }

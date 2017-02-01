@@ -115,6 +115,13 @@ public class MoviesRecyclerViewAdapter
         String movieImagesBaseUrl = mMoviesPresenter.getMovieImagesBaseUrl();
         if (TextUtils.isEmpty(movieImagesBaseUrl)) return;
 
+        String moviePosterPath = movie.getPosterPath(movieImagesBaseUrl);
+        if (TextUtils.isEmpty(moviePosterPath)) {
+            // This can happen when a movie does not have an image associated
+            holder.mImageContainerView.setVisibility(View.GONE);
+            return;
+        }
+
         RequestListener<String, GlideDrawable> requestListener =
                 new RequestListener<String, GlideDrawable>() {
                     @Override
@@ -132,6 +139,7 @@ public class MoviesRecyclerViewAdapter
                             GlideDrawable resource, String model,
                             Target<GlideDrawable> target, boolean isFromMemoryCache,
                             boolean isFirstResource) {
+                        holder.mImageContainerView.setVisibility(View.VISIBLE);
                         float rating = movie.getVoteAverage();
                         // Show only movies with rating, 0.0 meaning no ratings (most of the times)
                         if (rating != 0.0) {
@@ -174,7 +182,7 @@ public class MoviesRecyclerViewAdapter
         holder.mRatingMovieView.setVisibility(View.GONE);
 
         DrawableRequestBuilder builder = Glide.with(MoviesApplication.getInstance())
-                .load(movie.getPosterPath(movieImagesBaseUrl))
+                .load(moviePosterPath)
                 .crossFade()
                 .fitCenter()
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
