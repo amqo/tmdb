@@ -15,20 +15,24 @@ public class FabUpPresenter implements MoviesFabUpContract.Presenter {
     @Inject
     public FabUpPresenter(MoviesFabUpContract.View fabUpView) {
         mFabUpView = fabUpView;
-        mUpFAB = mFabUpView.getFabUp();
+    }
 
-        initUpFab();
+    @Override
+    public boolean isUpFABVisible() {
+        return mUpFAB == null ? false : mUpFAB.isShown();
     }
 
     @Override
     public void setShownUpFAB(final boolean show) {
+        if (mUpFAB == null) return;
         if (show) mUpFAB.show();
         else mUpFAB.hide();
     }
 
     @Override
-    public boolean isUpFABVisible() {
-        return mUpFAB.isShown();
+    public void setUpFab(FloatingActionButton upFab) {
+        mUpFAB = upFab;
+        initUpFab();
     }
 
     private void initUpFab() {

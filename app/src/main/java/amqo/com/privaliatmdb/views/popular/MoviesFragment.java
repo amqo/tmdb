@@ -1,12 +1,7 @@
 package amqo.com.privaliatmdb.views.popular;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,62 +11,43 @@ import javax.inject.Inject;
 import amqo.com.privaliatmdb.MoviesApplication;
 import amqo.com.privaliatmdb.R;
 import amqo.com.privaliatmdb.model.Movie;
-import amqo.com.privaliatmdb.model.Movies;
-import amqo.com.privaliatmdb.model.contracts.ConnectivityReceiverContract;
-import amqo.com.privaliatmdb.model.contracts.MoviesAdapterContract;
 import amqo.com.privaliatmdb.model.contracts.MoviesContract;
 import amqo.com.privaliatmdb.model.contracts.MoviesFabUpContract;
-import amqo.com.privaliatmdb.model.contracts.MoviesScrollContract;
-import amqo.com.privaliatmdb.receivers.ConnectivityNotifier;
-import amqo.com.privaliatmdb.views.utils.NotificationsHelper;
-import amqo.com.privaliatmdb.views.utils.ScreenHelper;
-import butterknife.BindView;
-import butterknife.ButterKnife;
+import amqo.com.privaliatmdb.views.BaseMoviesFragment;
 
-public class MoviesFragment extends Fragment
-        implements MoviesContract.View,
-        MoviesScrollContract.View,
-        ConnectivityReceiverContract.View,
-        MoviesFabUpContract.View {
+public class MoviesFragment extends BaseMoviesFragment
+        implements MoviesFabUpContract.View {
 
     @Inject MoviesContract.PresenterPopular mMoviesPresenter;
-    @Inject RecyclerView.LayoutManager mLayoutManager;
-    @Inject MoviesAdapterContract.View mMoviesAdapter;
 
     // Here the injection is for the implementation of the Contracts
     // This is to make constructor injection work
     @Inject MoviesScrollListener mScrollListener;
-    @Inject ConnectivityNotifier mConnectivityNotifier;
+    @Inject FabUpPresenter mFabUpPresenter;
 
-    @BindView(R.id.list_refresh)
-    SwipeRefreshLayout mSwipeRefreshLayout;
-    @BindView(R.id.list)
-    RecyclerView mRecyclerView;
-    @BindView(R.id.up_fab)
-    FloatingActionButton mUpFAB;
-
-    private boolean mIsLoading = false;
-    private boolean mIsRefreshing = false;
-    private boolean mNeedRefresh = false;
-
-    private Snackbar mConnectivitySnackbar;
+    private FloatingActionButton mUpFAB;
 
     public static MoviesFragment newInstance() {
         return new MoviesFragment();
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(
+            LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_movies, container, false);
-        ButterKnife.bind(this, view);
+
+        super.bindViews(view);
 
         MoviesApplication.getInstance().getMoviesComponent().inject(this);
 
-        initRecyclerView();
+        mUpFAB = (FloatingActionButton) view.findViewById(R.id.up_fab);
+        mFabUpPresenter.setUpFab(mUpFAB);
 
-        initOtherViews();
+        mScrollListener.setPresenter(mFabUpPresenter);
+
+        mRecyclerView.addOnScrollListener(mScrollListener);
 
         if(mConnectivityNotifier.isConnected()) {
             mMoviesPresenter.getMovies(1);
@@ -80,134 +56,26 @@ public class MoviesFragment extends Fragment
         return view;
     }
 
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        if (mNeedRefresh)
-            mConnectivitySnackbar = NotificationsHelper
-                    .showSnackConnectivity(getContext(), getView());
-    }
+    // Parent abstract methods
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        boolean connected = mConnectivityNotifier.isConnected();
-        onNetworkConnectionChanged(connected);
-    }
-
-    // MoviesContract.View methods
-
-    @Override
-    public void refreshMovies() {
-        if(!mConnectivityNotifier.isConnected()) return;
+    protected void resetMovies() {
         setLoading(true);
         mIsRefreshing = true;
         mMoviesPresenter.getMovies(1);
     }
 
-    @Override
-    public void setLoading(boolean loading) {
-        mIsLoading = loading;
-        if (getActivity() == null) return;
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mSwipeRefreshLayout.setRefreshing(mIsLoading);
-            }
-        });
-    }
-
-    @Override
-    public int getScreenDensity() {
-        return ScreenHelper.getScreenDensity(getActivity());
-    }
-
-    @Override
-    public void onMovieInteraction(Movie movie) {
+    protected void movieInteraction(Movie movie) {
 
     }
 
-    @Override
-    public void onMoviesLoaded(Movies movies) {
-        if (mIsRefreshing) {
-            mIsRefreshing = false;
-            mMoviesAdapter.refreshMovies(movies);
-        } else mMoviesAdapter.addMovies(movies);
-    }
-
-    // MoviesScrollContract.View methods
-
-    @Override
-    public boolean isLoading() {
-        return mIsLoading;
-    }
-
-    @Override
-    public void loadMoreMovies() {
-        if(!mConnectivityNotifier.isConnected()) return;
-        int lastPageLoaded = mMoviesAdapter.getLastPageLoaded();
-        mMoviesPresenter.getMovies(lastPageLoaded + 1);
-    }
-
-    @Override
-    public boolean isInLastPage() {
-        return mMoviesAdapter.isInLastPage();
-    }
-
-    @Override
-    public RecyclerView.LayoutManager getLayoutManager() {
-        return mLayoutManager;
+    protected void loadMoreMoviesInPage(int page) {
+        mMoviesPresenter.getMovies(page);
     }
 
     // MoviesFabUpContract.View methods
 
     @Override
-    public FloatingActionButton getFabUp() {
-        return mUpFAB;
-    }
-
-    @Override
     public void scrollUp() {
         mRecyclerView.scrollToPosition(0);
-    }
-
-    // ConnectivityReceiverContract.View methods
-
-    @Override
-    public void onNetworkConnectionChanged(boolean isConnected) {
-        if (!isConnected) {
-            mNeedRefresh = true;
-            mConnectivitySnackbar = NotificationsHelper
-                    .showSnackConnectivity(getContext(), getView());
-        } else {
-            if (mConnectivitySnackbar != null) {
-                mConnectivitySnackbar.dismiss();
-                mConnectivitySnackbar = null;
-            }
-            if (mNeedRefresh) {
-                mNeedRefresh = false;
-                refreshMovies();
-            }
-        }
-    }
-
-    private void initRecyclerView() {
-
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.addOnScrollListener(mScrollListener);
-        mRecyclerView.setAdapter((RecyclerView.Adapter) mMoviesAdapter);
-    }
-
-    private void initOtherViews() {
-
-        mSwipeRefreshLayout.setOnRefreshListener(
-                new SwipeRefreshLayout.OnRefreshListener() {
-                    @Override
-                    public void onRefresh() {
-                        if (!mConnectivityNotifier.isConnected())
-                            mSwipeRefreshLayout.setRefreshing(false);
-                        else refreshMovies();
-                    }
-                });
     }
 }

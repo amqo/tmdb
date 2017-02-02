@@ -14,7 +14,8 @@ import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
-public class SearchMoviesPresenter extends BaseMoviesPresenter implements MoviesContract.PresenterSearch {
+public class SearchMoviesPresenter extends BaseMoviesPresenter
+        implements MoviesContract.PresenterSearch {
 
     public SearchMoviesPresenter(
             MoviesEndpoint moviesEndpoint,

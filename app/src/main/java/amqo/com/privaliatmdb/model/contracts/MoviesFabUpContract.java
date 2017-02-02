@@ -6,8 +6,6 @@ public interface MoviesFabUpContract {
 
     interface View {
 
-        FloatingActionButton getFabUp();
-
         void scrollUp();
     }
 
@@ -16,5 +14,7 @@ public interface MoviesFabUpContract {
         boolean isUpFABVisible();
 
         void setShownUpFAB(boolean show);
+
+        void setUpFab(FloatingActionButton upFab);
     }
 }

@@ -19,21 +19,14 @@ public class MoviesScrollListener extends BaseScrollListener {
 
     private boolean mScrollingUp = false;
 
-    private final MoviesFabUpContract.Presenter mMoviesFabUpPrsenter;
+    private MoviesFabUpContract.Presenter mMoviesFabUpPrsenter;
 
     @Inject
     public MoviesScrollListener(
             MoviesApplication context,
-            MoviesScrollContract.View moviesScrollView,
-            // Here we are injecting an object which was also injected by constructor
-            // so the implementation is used, instead of the interface
-            FabUpPresenter moviesFabUpPresenter) {
+            MoviesScrollContract.View moviesScrollView) {
 
         super(context, moviesScrollView);
-
-        // Here we can assign the implementation to the interface, so to use another implementation
-        // only the constructor will need to be changed
-        mMoviesFabUpPrsenter = moviesFabUpPresenter;
     }
 
     @Override
@@ -45,6 +38,10 @@ public class MoviesScrollListener extends BaseScrollListener {
             return;
 
         manageFABVisibility(dy, getPastVisibleItems());
+    }
+
+    public void setPresenter(MoviesFabUpContract.Presenter moviesFabUpPresenter) {
+        mMoviesFabUpPrsenter = moviesFabUpPresenter;
     }
 
     private void manageFABVisibility(int dy, final int pastItems) {
