@@ -5,8 +5,6 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.bumptech.glide.DrawableRequestBuilder;
 import com.bumptech.glide.Glide;
@@ -24,11 +22,10 @@ import amqo.com.privaliatmdb.model.Movie;
 import amqo.com.privaliatmdb.model.Movies;
 import amqo.com.privaliatmdb.model.contracts.MoviesAdapterContract;
 import amqo.com.privaliatmdb.model.contracts.MoviesContract;
-import butterknife.BindView;
-import butterknife.ButterKnife;
+import amqo.com.privaliatmdb.views.viewHolders.MovieItemViewHolder;
 
 public class MoviesRecyclerViewAdapter
-        extends RecyclerView.Adapter<MoviesRecyclerViewAdapter.ViewHolder>
+        extends RecyclerView.Adapter<MovieItemViewHolder>
         implements MoviesAdapterContract.View {
 
     private final List<Movie> mValues;
@@ -50,14 +47,14 @@ public class MoviesRecyclerViewAdapter
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public MovieItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.movie_item, parent, false);
-        return new ViewHolder(view);
+        return new MovieItemViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
+    public void onBindViewHolder(final MovieItemViewHolder holder, int position) {
 
         Movie movie = mValues.get(position);
 
@@ -110,7 +107,7 @@ public class MoviesRecyclerViewAdapter
         return mLastReceivedMovies.getTotalPages() == mLastReceivedMovies.getPage();
     }
 
-    private void loadImageForMovie(final ViewHolder holder, final Movie movie) {
+    private void loadImageForMovie(final MovieItemViewHolder holder, final Movie movie) {
 
         String movieImagesBaseUrl = mMoviesPresenter.getMovieImagesBaseUrl();
         if (TextUtils.isEmpty(movieImagesBaseUrl)) return;
@@ -193,32 +190,5 @@ public class MoviesRecyclerViewAdapter
             builder.placeholder(R.drawable.cinema_placeholder);
 
         builder.into(holder.mImageView);
-    }
-
-    public class ViewHolder extends RecyclerView.ViewHolder {
-
-        public final View mView;
-
-        @BindView(R.id.image)
-        public ImageView mImageView;
-        @BindView(R.id.image_container)
-        public View mImageContainerView;
-        @BindView(R.id.title)
-        public TextView mTitleView;
-        @BindView(R.id.title_rank)
-        public TextView mTitleRankView;
-        @BindView(R.id.overview)
-        public TextView mOverView;
-        @BindView(R.id.image_rating)
-        RatingMovieView mRatingMovieView;
-
-        public Movie mItem;
-
-        public ViewHolder(View view) {
-            super(view);
-            mView = view;
-
-            ButterKnife.bind(this, view);
-        }
     }
 }
