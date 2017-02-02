@@ -6,19 +6,12 @@ public interface MoviesScrollContract {
 
     interface View {
 
-        RecyclerView.LayoutManager getLayoutManager();
-
         boolean isLoading();
 
         void loadMoreMovies();
 
         boolean isInLastPage();
-    }
 
-    interface FabView extends View {
-
-        boolean isUpFABVisible();
-
-        void setShownUpFAB(boolean show);
+        RecyclerView.LayoutManager getLayoutManager();
     }
 }

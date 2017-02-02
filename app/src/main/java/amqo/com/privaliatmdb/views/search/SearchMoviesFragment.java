@@ -37,9 +37,6 @@ import butterknife.ButterKnife;
 
 import static amqo.com.privaliatmdb.R.id.search;
 
-/**
- * A placeholder fragment containing a simple view.
- */
 public class SearchMoviesFragment extends Fragment
         implements MoviesContract.ViewSearch,
         MoviesScrollContract.View,
@@ -160,6 +157,8 @@ public class SearchMoviesFragment extends Fragment
         });
     }
 
+    // MoviesContract.View methods
+
     @Override
     public void refreshMovies() {
         if (!mConnectivityNotifier.isConnected()) return;
@@ -170,12 +169,6 @@ public class SearchMoviesFragment extends Fragment
         setLoading(true);
         mIsRefreshing = true;
         mMoviesPresenter.searchMovies(1, mCurrentSearchTerm);
-    }
-
-    @Override
-    public void refreshMovies(String query) {
-        mCurrentSearchTerm = query;
-        refreshMovies();
     }
 
     @Override
@@ -192,13 +185,13 @@ public class SearchMoviesFragment extends Fragment
     }
 
     @Override
-    public void onMovieInteraction(Movie movie) {
-        mSearchView.clearFocus();
+    public int getScreenDensity() {
+        return ScreenHelper.getScreenDensity(getActivity());
     }
 
     @Override
-    public int getScreenDensity() {
-        return ScreenHelper.getScreenDensity(getActivity());
+    public void onMovieInteraction(Movie movie) {
+        mSearchView.clearFocus();
     }
 
     @Override
@@ -209,10 +202,15 @@ public class SearchMoviesFragment extends Fragment
         } else mMoviesAdapter.addMovies(movies);
     }
 
+    // MoviesContract.ViewSearch methods
+
     @Override
-    public RecyclerView.LayoutManager getLayoutManager() {
-        return mLayoutManager;
+    public void refreshMovies(String query) {
+        mCurrentSearchTerm = query;
+        refreshMovies();
     }
+
+    // MoviesScrollContract.View methods
 
     @Override
     public boolean isLoading() {
@@ -230,6 +228,13 @@ public class SearchMoviesFragment extends Fragment
     public boolean isInLastPage() {
         return mMoviesAdapter.isInLastPage();
     }
+
+    @Override
+    public RecyclerView.LayoutManager getLayoutManager() {
+        return mLayoutManager;
+    }
+
+    // ConnectivityReceiverContract.View methods
 
     @Override
     public void onNetworkConnectionChanged(boolean isConnected) {

@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import javax.inject.Inject;
 
 import amqo.com.privaliatmdb.MoviesApplication;
+import amqo.com.privaliatmdb.model.contracts.MoviesFabUpContract;
 import amqo.com.privaliatmdb.model.contracts.MoviesScrollContract;
 import amqo.com.privaliatmdb.views.BaseScrollListener;
 
@@ -18,16 +19,21 @@ public class MoviesScrollListener extends BaseScrollListener {
 
     private boolean mScrollingUp = false;
 
-    private final MoviesScrollContract.FabView mMoviesScrollFabView;
+    private final MoviesFabUpContract.Presenter mMoviesFabUpPrsenter;
 
     @Inject
     public MoviesScrollListener(
             MoviesApplication context,
-            MoviesScrollContract.FabView moviesScrollView) {
+            MoviesScrollContract.View moviesScrollView,
+            // Here we are injecting an object which was also injected by constructor
+            // so the implementation is used, instead of the interface
+            FabUpPresenter moviesFabUpPresenter) {
 
         super(context, moviesScrollView);
 
-        mMoviesScrollFabView = moviesScrollView;
+        // Here we can assign the implementation to the interface, so to use another implementation
+        // only the constructor will need to be changed
+        mMoviesFabUpPrsenter = moviesFabUpPresenter;
     }
 
     @Override
@@ -55,8 +61,8 @@ public class MoviesScrollListener extends BaseScrollListener {
         // If FAB is visible and is scrolling down,
         // or reach a top item position, make FAB gone automatically
         if ((!mScrollingUp || pastItems < THRESHOLD + 1) &&
-                mMoviesScrollFabView.isUpFABVisible()) {
-            mMoviesScrollFabView.setShownUpFAB(false);
+                mMoviesFabUpPrsenter.isUpFABVisible()) {
+            mMoviesFabUpPrsenter.setShownUpFAB(false);
         }
 
         // If no change in scroll direction, keep FAB visibility
@@ -67,8 +73,8 @@ public class MoviesScrollListener extends BaseScrollListener {
             public void run() {
                 // If scrolling up and FAB is not already visible, and not in top item position,
                 // then make FAB visible, unless a change in scroll direction occurs before timer delay
-                if (mScrollingUp && !mMoviesScrollFabView.isUpFABVisible() && pastItems > THRESHOLD) {
-                    mMoviesScrollFabView.setShownUpFAB(true);
+                if (mScrollingUp && !mMoviesFabUpPrsenter.isUpFABVisible() && pastItems > THRESHOLD) {
+                    mMoviesFabUpPrsenter.setShownUpFAB(true);
                 }
             }
         };

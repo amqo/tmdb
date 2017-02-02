@@ -20,6 +20,7 @@ import amqo.com.privaliatmdb.model.Movies;
 import amqo.com.privaliatmdb.model.contracts.ConnectivityReceiverContract;
 import amqo.com.privaliatmdb.model.contracts.MoviesAdapterContract;
 import amqo.com.privaliatmdb.model.contracts.MoviesContract;
+import amqo.com.privaliatmdb.model.contracts.MoviesFabUpContract;
 import amqo.com.privaliatmdb.model.contracts.MoviesScrollContract;
 import amqo.com.privaliatmdb.receivers.ConnectivityNotifier;
 import amqo.com.privaliatmdb.views.utils.NotificationsHelper;
@@ -29,8 +30,9 @@ import butterknife.ButterKnife;
 
 public class MoviesFragment extends Fragment
         implements MoviesContract.View,
-        MoviesScrollContract.FabView,
-        ConnectivityReceiverContract.View {
+        MoviesScrollContract.View,
+        ConnectivityReceiverContract.View,
+        MoviesFabUpContract.View {
 
     @Inject MoviesContract.PresenterPopular mMoviesPresenter;
     @Inject RecyclerView.LayoutManager mLayoutManager;
@@ -93,6 +95,8 @@ public class MoviesFragment extends Fragment
         onNetworkConnectionChanged(connected);
     }
 
+    // MoviesContract.View methods
+
     @Override
     public void refreshMovies() {
         if(!mConnectivityNotifier.isConnected()) return;
@@ -114,23 +118,6 @@ public class MoviesFragment extends Fragment
     }
 
     @Override
-    public boolean isLoading() {
-        return mIsLoading;
-    }
-
-    @Override
-    public void loadMoreMovies() {
-        if(!mConnectivityNotifier.isConnected()) return;
-        int lastPageLoaded = mMoviesAdapter.getLastPageLoaded();
-        mMoviesPresenter.getMovies(lastPageLoaded + 1);
-    }
-
-    @Override
-    public boolean isInLastPage() {
-        return mMoviesAdapter.isInLastPage();
-    }
-
-    @Override
     public int getScreenDensity() {
         return ScreenHelper.getScreenDensity(getActivity());
     }
@@ -148,21 +135,43 @@ public class MoviesFragment extends Fragment
         } else mMoviesAdapter.addMovies(movies);
     }
 
+    // MoviesScrollContract.View methods
+
     @Override
-    public void setShownUpFAB(final boolean show) {
-        if (show) mUpFAB.show();
-        else mUpFAB.hide();
+    public boolean isLoading() {
+        return mIsLoading;
     }
 
     @Override
-    public boolean isUpFABVisible() {
-        return mUpFAB.isShown();
+    public void loadMoreMovies() {
+        if(!mConnectivityNotifier.isConnected()) return;
+        int lastPageLoaded = mMoviesAdapter.getLastPageLoaded();
+        mMoviesPresenter.getMovies(lastPageLoaded + 1);
+    }
+
+    @Override
+    public boolean isInLastPage() {
+        return mMoviesAdapter.isInLastPage();
     }
 
     @Override
     public RecyclerView.LayoutManager getLayoutManager() {
         return mLayoutManager;
     }
+
+    // MoviesFabUpContract.View methods
+
+    @Override
+    public FloatingActionButton getFabUp() {
+        return mUpFAB;
+    }
+
+    @Override
+    public void scrollUp() {
+        mRecyclerView.scrollToPosition(0);
+    }
+
+    // ConnectivityReceiverContract.View methods
 
     @Override
     public void onNetworkConnectionChanged(boolean isConnected) {
@@ -190,13 +199,6 @@ public class MoviesFragment extends Fragment
     }
 
     private void initOtherViews() {
-        mUpFAB.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mUpFAB.hide();
-                mRecyclerView.scrollToPosition(0);
-            }
-        });
 
         mSwipeRefreshLayout.setOnRefreshListener(
                 new SwipeRefreshLayout.OnRefreshListener() {

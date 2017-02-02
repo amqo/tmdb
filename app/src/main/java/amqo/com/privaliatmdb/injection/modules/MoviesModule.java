@@ -13,6 +13,7 @@ import amqo.com.privaliatmdb.injection.scopes.PerFragment;
 import amqo.com.privaliatmdb.model.contracts.ConnectivityReceiverContract;
 import amqo.com.privaliatmdb.model.contracts.MoviesAdapterContract;
 import amqo.com.privaliatmdb.model.contracts.MoviesContract;
+import amqo.com.privaliatmdb.model.contracts.MoviesFabUpContract;
 import amqo.com.privaliatmdb.model.contracts.MoviesScrollContract;
 import amqo.com.privaliatmdb.network.MoviesEndpoint;
 import amqo.com.privaliatmdb.views.MoviesRecyclerViewAdapter;
@@ -67,12 +68,17 @@ public class MoviesModule {
     }
 
     @Provides @PerFragment
-    MoviesScrollContract.FabView providesMoviesScrollView() {
+    MoviesScrollContract.View providesMoviesScrollView() {
         return mMoviesFragment;
     }
 
     @Provides @PerFragment
     ConnectivityReceiverContract.View providesConnectivityView() {
+        return mMoviesFragment;
+    }
+
+    @Provides @PerFragment
+    MoviesFabUpContract.View providesMoviesFabUpView() {
         return mMoviesFragment;
     }
 
