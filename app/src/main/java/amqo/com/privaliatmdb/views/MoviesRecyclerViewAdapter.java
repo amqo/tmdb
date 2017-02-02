@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.bumptech.glide.DrawableRequestBuilder;
 import com.bumptech.glide.Glide;
@@ -14,7 +15,9 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import amqo.com.privaliatmdb.MoviesApplication;
 import amqo.com.privaliatmdb.R;
@@ -36,6 +39,9 @@ public class MoviesRecyclerViewAdapter
     private int mImageHeight = 0;
 
     private Movies mLastReceivedMovies;
+
+    private Map<ImageView, View.OnLayoutChangeListener>
+            mCurrentLayoutListeners = new HashMap<>();
 
     public MoviesRecyclerViewAdapter(
             MoviesContract.View moviesView,
@@ -153,21 +159,27 @@ public class MoviesRecyclerViewAdapter
         boolean auto = mImageWidth == 0 || mImageHeight == 0;
         if (auto) {
             // Add layout change listener only if a previous listener didn't fire before
-            holder.mImageView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            View.OnLayoutChangeListener layoutChangeListener = new View.OnLayoutChangeListener() {
                 @Override
                 public void onLayoutChange(View view, int i, int i1, int width, int height, int i4, int i5, int i6, int i7) {
                     if (width > 0 && height > 0) {
                         float ratio = (float)height / width;
                         // To understand this constants, please check https://www.themoviedb.org/documentation/editing/images
-                        if (ratio < 1.55 && ratio > 1.45) {
+                        if (ratio < 1.60 && ratio > 1.40) {
                             mImageWidth = width;
                             mImageHeight = height;
+
+                            // Ass we already have what we wanted, we can remove all listeners
+                            for (ImageView imageView : mCurrentLayoutListeners.keySet()) {
+                                imageView.removeOnLayoutChangeListener(mCurrentLayoutListeners.get(imageView));
+                            }
+                            mCurrentLayoutListeners.clear();
                         }
-                        // Ass we already have what we wanted, we can remove this listener
-                        holder.mImageView.removeOnLayoutChangeListener(this);
                     }
                 }
-            });
+            };
+            mCurrentLayoutListeners.put(holder.mImageView, layoutChangeListener);
+            holder.mImageView.addOnLayoutChangeListener(layoutChangeListener);
         } else {
             // If we got the width and height of images, we force the layout to avoid "jumps"
             ViewGroup.LayoutParams params = holder.mImageView.getLayoutParams();
@@ -185,9 +197,8 @@ public class MoviesRecyclerViewAdapter
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .listener(requestListener);
 
-        // Use placeholder only if we are forcing the layout
-        if (!auto)
-            builder.placeholder(R.drawable.cinema_placeholder);
+
+        builder.placeholder(R.drawable.cinema_placeholder);
 
         builder.into(holder.mImageView);
     }
