@@ -3,6 +3,7 @@ package amqo.com.privaliatmdb;
 import android.app.Application;
 
 import amqo.com.privaliatmdb.injection.ApplicationComponent;
+import amqo.com.privaliatmdb.injection.BaseMoviesComponent;
 import amqo.com.privaliatmdb.injection.DaggerApplicationComponent;
 import amqo.com.privaliatmdb.injection.MoviesComponent;
 import amqo.com.privaliatmdb.injection.SearchMoviesComponent;
@@ -60,5 +61,10 @@ public class MoviesApplication extends Application {
 
     public void releaseSearchMoviesComponent() {
         mSearchMoviesComponent = null;
+    }
+
+    public BaseMoviesComponent getCurrentMoviesComponent() {
+        if (mSearchMoviesComponent != null) return mSearchMoviesComponent;
+        else return mMoviesComponent;
     }
 }

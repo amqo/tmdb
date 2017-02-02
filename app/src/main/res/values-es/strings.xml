@@ -6,4 +6,6 @@
     <string name="search_hint">Escribe el nombre de la película</string>
     <string name="title_activity_search">Busca Películas</string>
     <string name="action_settings">Configuración</string>
+    <string name="Notification.Action.Connect">Conectar</string>
+    <string name="Toast.Connection.Off">Se ha perdido la conexión a Internet!</string>
 </resources>

@@ -10,9 +10,10 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
 import amqo.com.privaliatmdb.MoviesApplication;
 import amqo.com.privaliatmdb.R;
 import amqo.com.privaliatmdb.injection.scopes.PerFragment;
-import amqo.com.privaliatmdb.model.MoviesAdapterContract;
-import amqo.com.privaliatmdb.model.MoviesContract;
-import amqo.com.privaliatmdb.model.MoviesScrollContract;
+import amqo.com.privaliatmdb.model.contracts.ConnectivityReceiverContract;
+import amqo.com.privaliatmdb.model.contracts.MoviesAdapterContract;
+import amqo.com.privaliatmdb.model.contracts.MoviesContract;
+import amqo.com.privaliatmdb.model.contracts.MoviesScrollContract;
 import amqo.com.privaliatmdb.network.MoviesEndpoint;
 import amqo.com.privaliatmdb.views.MoviesRecyclerViewAdapter;
 import amqo.com.privaliatmdb.views.popular.MoviesFragment;
@@ -67,6 +68,11 @@ public class MoviesModule {
 
     @Provides @PerFragment
     MoviesScrollContract.FabView providesMoviesScrollView() {
+        return mMoviesFragment;
+    }
+
+    @Provides @PerFragment
+    ConnectivityReceiverContract.View providesConnectivityView() {
         return mMoviesFragment;
     }
 

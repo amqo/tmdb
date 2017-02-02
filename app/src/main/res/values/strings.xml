@@ -5,4 +5,7 @@
     <string name="search_hint">Type the name of the movie</string>
     <string name="title_activity_search">Search Movies</string>
     <string name="action_settings">Settings</string>
+
+    <string name="Toast.Connection.Off">Connection lost to Internet!</string>
+    <string name="Notification.Action.Connect">Connect</string>
 </resources>

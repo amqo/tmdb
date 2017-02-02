@@ -1,4 +1,6 @@
-package amqo.com.privaliatmdb.model;
+package amqo.com.privaliatmdb.model.contracts;
+
+import amqo.com.privaliatmdb.model.Movies;
 
 public interface MoviesAdapterContract {
 

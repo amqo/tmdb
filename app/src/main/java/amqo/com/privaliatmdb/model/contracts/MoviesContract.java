@@ -1,4 +1,7 @@
-package amqo.com.privaliatmdb.model;
+package amqo.com.privaliatmdb.model.contracts;
+
+import amqo.com.privaliatmdb.model.Movie;
+import amqo.com.privaliatmdb.model.Movies;
 
 public interface MoviesContract {
 
@@ -8,9 +11,9 @@ public interface MoviesContract {
 
         void setLoading(boolean loading);
 
-        void onMovieInteraction(Movie movie);
-
         int getScreenDensity();
+
+        void onMovieInteraction(Movie movie);
 
         void onMoviesLoaded(Movies movies);
     }

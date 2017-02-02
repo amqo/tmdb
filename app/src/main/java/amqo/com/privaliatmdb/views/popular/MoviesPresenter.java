@@ -4,7 +4,7 @@ import android.content.SharedPreferences;
 import android.text.TextUtils;
 
 import amqo.com.privaliatmdb.model.Movies;
-import amqo.com.privaliatmdb.model.MoviesContract;
+import amqo.com.privaliatmdb.model.contracts.MoviesContract;
 import amqo.com.privaliatmdb.network.MovieParameterCreator;
 import amqo.com.privaliatmdb.network.MoviesEndpoint;
 import amqo.com.privaliatmdb.views.BaseMoviesPresenter;

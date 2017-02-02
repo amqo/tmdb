@@ -5,11 +5,11 @@ import android.support.v7.widget.SearchView;
 
 import javax.inject.Inject;
 
-import amqo.com.privaliatmdb.model.MoviesContract;
+import amqo.com.privaliatmdb.model.contracts.MoviesContract;
 
 public class SearchQueryListener implements SearchView.OnQueryTextListener {
 
-    private final int TIMER_DELAY = 600;
+    private final int TIMER_DELAY = 800;
     private Handler mQueryHandler = new Handler();
     private Runnable mQueryRunnable;
 

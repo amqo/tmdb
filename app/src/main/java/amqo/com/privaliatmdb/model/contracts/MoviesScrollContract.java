@@ -1,4 +1,4 @@
-package amqo.com.privaliatmdb.model;
+package amqo.com.privaliatmdb.model.contracts;
 
 import android.support.v7.widget.RecyclerView;
 

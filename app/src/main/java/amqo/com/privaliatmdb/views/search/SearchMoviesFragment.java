@@ -4,6 +4,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -23,10 +24,13 @@ import amqo.com.privaliatmdb.MoviesApplication;
 import amqo.com.privaliatmdb.R;
 import amqo.com.privaliatmdb.model.Movie;
 import amqo.com.privaliatmdb.model.Movies;
-import amqo.com.privaliatmdb.model.MoviesAdapterContract;
-import amqo.com.privaliatmdb.model.MoviesContract;
-import amqo.com.privaliatmdb.model.MoviesScrollContract;
+import amqo.com.privaliatmdb.model.contracts.ConnectivityReceiverContract;
+import amqo.com.privaliatmdb.model.contracts.MoviesAdapterContract;
+import amqo.com.privaliatmdb.model.contracts.MoviesContract;
+import amqo.com.privaliatmdb.model.contracts.MoviesScrollContract;
+import amqo.com.privaliatmdb.receivers.ConnectivityNotifier;
 import amqo.com.privaliatmdb.views.BaseScrollListener;
+import amqo.com.privaliatmdb.views.utils.NotificationsHelper;
 import amqo.com.privaliatmdb.views.utils.ScreenHelper;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -36,7 +40,10 @@ import static amqo.com.privaliatmdb.R.id.search;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class SearchMoviesFragment extends Fragment implements MoviesContract.ViewSearch, MoviesScrollContract.View {
+public class SearchMoviesFragment extends Fragment
+        implements MoviesContract.ViewSearch,
+        MoviesScrollContract.View,
+        ConnectivityReceiverContract.View {
 
     @Inject MoviesContract.PresenterSearch mMoviesPresenter;
     @Inject RecyclerView.LayoutManager mLayoutManager;
@@ -46,6 +53,7 @@ public class SearchMoviesFragment extends Fragment implements MoviesContract.Vie
     // This is to make constructor injection work
     @Inject BaseScrollListener mScrollListener;
     @Inject SearchQueryListener mSearchQueryListener;
+    @Inject ConnectivityNotifier mConnectivityNotifier;
 
     @BindView(R.id.list_refresh)
     SwipeRefreshLayout mSwipeRefreshLayout;
@@ -56,9 +64,11 @@ public class SearchMoviesFragment extends Fragment implements MoviesContract.Vie
 
     private boolean mIsLoading = false;
     private boolean mIsRefreshing = false;
+    private boolean mNeedRefresh = false;
 
     private SearchView mSearchView;
     private String mCurrentSearchTerm;
+    private Snackbar mConnectivitySnackbar;
 
     public static SearchMoviesFragment newInstance() {
         return new SearchMoviesFragment();
@@ -86,11 +96,27 @@ public class SearchMoviesFragment extends Fragment implements MoviesContract.Vie
 
         initOtherViews();
 
-        if(!TextUtils.isEmpty(mCurrentSearchTerm)) {
+        boolean connected = mConnectivityNotifier.isConnected();
+        if(!TextUtils.isEmpty(mCurrentSearchTerm) && connected) {
             mMoviesPresenter.searchMovies(1, mCurrentSearchTerm);
         }
 
         return view;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        if (mNeedRefresh)
+            mConnectivitySnackbar = NotificationsHelper
+                    .showSnackConnectivity(getContext(), getView());
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        boolean connected = mConnectivityNotifier.isConnected();
+        onNetworkConnectionChanged(connected);
     }
 
     @Override
@@ -136,12 +162,13 @@ public class SearchMoviesFragment extends Fragment implements MoviesContract.Vie
 
     @Override
     public void refreshMovies() {
-        setLoading(true);
-        mIsRefreshing = true;
+        if (!mConnectivityNotifier.isConnected()) return;
         if (TextUtils.isEmpty(mCurrentSearchTerm)) {
             mMoviesAdapter.refreshMovies(new Movies());
             return;
         }
+        setLoading(true);
+        mIsRefreshing = true;
         mMoviesPresenter.searchMovies(1, mCurrentSearchTerm);
     }
 
@@ -166,7 +193,7 @@ public class SearchMoviesFragment extends Fragment implements MoviesContract.Vie
 
     @Override
     public void onMovieInteraction(Movie movie) {
-
+        mSearchView.clearFocus();
     }
 
     @Override
@@ -194,6 +221,7 @@ public class SearchMoviesFragment extends Fragment implements MoviesContract.Vie
 
     @Override
     public void loadMoreMovies() {
+        if (!mConnectivityNotifier.isConnected()) return;
         int lastPageLoaded = mMoviesAdapter.getLastPageLoaded();
         mMoviesPresenter.searchMovies(lastPageLoaded + 1, mCurrentSearchTerm);
     }
@@ -201,6 +229,24 @@ public class SearchMoviesFragment extends Fragment implements MoviesContract.Vie
     @Override
     public boolean isInLastPage() {
         return mMoviesAdapter.isInLastPage();
+    }
+
+    @Override
+    public void onNetworkConnectionChanged(boolean isConnected) {
+        if (!isConnected) {
+            mNeedRefresh = true;
+            mConnectivitySnackbar = NotificationsHelper
+                    .showSnackConnectivity(getContext(), getView());
+        } else {
+            if (mConnectivitySnackbar != null) {
+                mConnectivitySnackbar.dismiss();
+                mConnectivitySnackbar = null;
+            }
+            if (mNeedRefresh) {
+                mNeedRefresh = false;
+                refreshMovies();
+            }
+        }
     }
 
     private void initRecyclerView() {
@@ -216,7 +262,9 @@ public class SearchMoviesFragment extends Fragment implements MoviesContract.Vie
                 new SwipeRefreshLayout.OnRefreshListener() {
                     @Override
                     public void onRefresh() {
-                        refreshMovies();
+                        if (!mConnectivityNotifier.isConnected())
+                            mSwipeRefreshLayout.setRefreshing(false);
+                        else refreshMovies();
                     }
                 });
     }

@@ -6,12 +6,12 @@ import android.support.v7.widget.RecyclerView;
 import javax.inject.Inject;
 
 import amqo.com.privaliatmdb.MoviesApplication;
-import amqo.com.privaliatmdb.model.MoviesScrollContract;
+import amqo.com.privaliatmdb.model.contracts.MoviesScrollContract;
 import amqo.com.privaliatmdb.views.BaseScrollListener;
 
 public class MoviesScrollListener extends BaseScrollListener {
 
-    private final int TIMER_DELAY = 500;
+    private final int TIMER_DELAY = 800;
 
     private Handler mShowFabHandler = new Handler();
     private Runnable mShowFabRunnable;

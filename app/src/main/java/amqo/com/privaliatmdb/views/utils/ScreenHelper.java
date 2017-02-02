@@ -8,7 +8,7 @@ import android.view.WindowManager;
 
 import amqo.com.privaliatmdb.MoviesApplication;
 import amqo.com.privaliatmdb.model.MoviesConfiguration;
-import amqo.com.privaliatmdb.model.MoviesContract;
+import amqo.com.privaliatmdb.model.contracts.MoviesContract;
 
 public abstract class ScreenHelper {
 

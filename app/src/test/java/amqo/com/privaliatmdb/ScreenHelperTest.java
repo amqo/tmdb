@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import amqo.com.privaliatmdb.model.MoviesConfiguration;
-import amqo.com.privaliatmdb.model.MoviesContract;
+import amqo.com.privaliatmdb.model.contracts.MoviesContract;
 import amqo.com.privaliatmdb.views.utils.ScreenHelper;
 
 import static org.hamcrest.CoreMatchers.is;

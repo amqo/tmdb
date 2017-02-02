@@ -9,7 +9,7 @@ import javax.inject.Inject;
 
 import amqo.com.privaliatmdb.MoviesApplication;
 import amqo.com.privaliatmdb.R;
-import amqo.com.privaliatmdb.model.MoviesScrollContract;
+import amqo.com.privaliatmdb.model.contracts.MoviesScrollContract;
 
 public class BaseScrollListener extends RecyclerView.OnScrollListener {
 

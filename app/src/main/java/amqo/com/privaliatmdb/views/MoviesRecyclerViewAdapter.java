@@ -22,8 +22,8 @@ import amqo.com.privaliatmdb.MoviesApplication;
 import amqo.com.privaliatmdb.R;
 import amqo.com.privaliatmdb.model.Movie;
 import amqo.com.privaliatmdb.model.Movies;
-import amqo.com.privaliatmdb.model.MoviesAdapterContract;
-import amqo.com.privaliatmdb.model.MoviesContract;
+import amqo.com.privaliatmdb.model.contracts.MoviesAdapterContract;
+import amqo.com.privaliatmdb.model.contracts.MoviesContract;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
