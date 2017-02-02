@@ -37,7 +37,11 @@ public class MoviesScrollListener extends BaseScrollListener {
         if (mMoviesScrollView.isLoading())
             return;
 
-        manageFABVisibility(dy, getPastVisibleItems());
+        int pastVisibleItems = getPastVisibleItems();
+        if (pastVisibleItems <= THRESHOLD) {
+            mShowFabHandler.removeCallbacks(mShowFabRunnable);
+            mMoviesFabUpPrsenter.setShownUpFAB(false);
+        } else manageFABVisibility(dy, getPastVisibleItems());
     }
 
     public void setPresenter(MoviesFabUpContract.Presenter moviesFabUpPresenter) {
