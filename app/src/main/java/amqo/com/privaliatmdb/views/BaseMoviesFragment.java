@@ -70,6 +70,7 @@ public abstract class BaseMoviesFragment extends Fragment
 
     @Override
     public void setLoading(boolean loading) {
+        if (mIsLoading == loading) return;
         mIsLoading = loading;
         if (getActivity() == null) return;
         getActivity().runOnUiThread(new Runnable() {

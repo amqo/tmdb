@@ -1,5 +1,7 @@
 package amqo.com.privaliatmdb.injection;
 
+import android.content.SharedPreferences;
+
 import javax.inject.Singleton;
 
 import amqo.com.privaliatmdb.MoviesApplication;
@@ -13,6 +15,8 @@ import dagger.Component;
 public interface ApplicationComponent {
 
     MoviesApplication application();
+
+    SharedPreferences getSharedPreferences();
 
     MoviesComponent getMoviesComponent(
             MoviesModule moviesModule);

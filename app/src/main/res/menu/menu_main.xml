@@ -4,7 +4,7 @@
     tools:context="amqo.com.privaliatmdb.views.popular.MainActivity">
     <item
         android:id="@+id/action_search"
-        android:title="search"
+        android:title="@string/search_title"
         app:showAsAction="always"
         android:icon="@drawable/ic_search" />
 </menu>
