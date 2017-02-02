@@ -96,6 +96,7 @@ public class MoviesRecyclerViewAdapter
 
     @Override
     public void addMovies(Movies movies) {
+        if (movies == null || movies.getMovies().isEmpty()) return;
         int previousSize = mValues.size();
         mValues.addAll(movies.getMovies());
         notifyItemRangeInserted(previousSize, mValues.size());

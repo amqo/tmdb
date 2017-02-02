@@ -68,6 +68,7 @@ public class SearchMoviesPresenter extends BaseMoviesPresenter
                 })
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
+                .onErrorReturnItem(new Movies())
                 .subscribe(consumer);
     }
 }

@@ -56,6 +56,7 @@ public abstract class BaseMoviesPresenter {
         configurationObservable
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
+                .onErrorReturnItem(new MoviesConfiguration())
                 .subscribe(mMoviesConfigurationConsumer);
     }
 
@@ -63,6 +64,7 @@ public abstract class BaseMoviesPresenter {
         mMoviesConsumer = new Consumer<Movies>() {
             @Override
             public void accept(Movies movies) throws Exception {
+                if (movies == null || movies.getMovies().isEmpty()) return;
                 mMoviesView.onMoviesLoaded(movies);
             }
         };
@@ -72,6 +74,9 @@ public abstract class BaseMoviesPresenter {
         mMoviesConfigurationConsumer = new Consumer<MoviesConfiguration>() {
             @Override
             public void accept(MoviesConfiguration moviesConfiguration) throws Exception {
+
+                if (moviesConfiguration.getSizes().isEmpty()) return;
+
                 SharedPreferences.Editor editor = mSharedPreferences.edit();
 
                 editor.putString(MoviesEndpoint.BASE_IMAGE_API_KEY,

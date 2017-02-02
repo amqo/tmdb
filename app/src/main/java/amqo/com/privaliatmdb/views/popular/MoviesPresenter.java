@@ -65,6 +65,7 @@ public class MoviesPresenter extends BaseMoviesPresenter implements MoviesContra
                 })
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
+                .onErrorReturnItem(new Movies())
                 .subscribe(consumer);
     }
 
