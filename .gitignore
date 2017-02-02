@@ -11,3 +11,4 @@ app/src/main/res/values/secret.xml
 app/src/main/java/amqo/com/privaliatmdb/PrivateConstants.java
 app/src/main/res/values/secret_keys.xml
 app/app-release.apk
+app/fabric.properties

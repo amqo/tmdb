@@ -2,6 +2,8 @@ package amqo.com.privaliatmdb;
 
 import android.app.Application;
 
+import com.crashlytics.android.Crashlytics;
+
 import amqo.com.privaliatmdb.injection.ApplicationComponent;
 import amqo.com.privaliatmdb.injection.BaseMoviesComponent;
 import amqo.com.privaliatmdb.injection.DaggerApplicationComponent;
@@ -12,6 +14,7 @@ import amqo.com.privaliatmdb.injection.modules.MoviesModule;
 import amqo.com.privaliatmdb.injection.modules.SearchMoviesModule;
 import amqo.com.privaliatmdb.views.popular.MoviesFragment;
 import amqo.com.privaliatmdb.views.search.SearchMoviesFragment;
+import io.fabric.sdk.android.Fabric;
 
 public class MoviesApplication extends Application {
 
@@ -29,6 +32,8 @@ public class MoviesApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        Fabric.with(this, new Crashlytics());
 
         INSTANCE = this;
 
