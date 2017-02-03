@@ -1,70 +1,49 @@
 package amqo.com.privaliatmdb;
 
 
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.support.test.InstrumentationRegistry;
+import android.support.annotation.NonNull;
+import android.support.design.widget.AppBarLayout;
+import android.support.test.espresso.NoMatchingViewException;
+import android.support.test.espresso.UiController;
+import android.support.test.espresso.ViewAction;
+import android.support.test.espresso.ViewAssertion;
 import android.support.test.espresso.ViewInteraction;
-import android.support.test.rule.ActivityTestRule;
+import android.support.test.espresso.matcher.BoundedMatcher;
 import android.support.test.runner.AndroidJUnit4;
-import android.support.test.uiautomator.By;
-import android.support.test.uiautomator.UiDevice;
-import android.support.test.uiautomator.UiObject;
-import android.support.test.uiautomator.UiObjectNotFoundException;
-import android.support.test.uiautomator.UiScrollable;
-import android.support.test.uiautomator.UiSelector;
-import android.support.test.uiautomator.Until;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.view.View;
 
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import amqo.com.privaliatmdb.injection.ApplicationComponent;
-import amqo.com.privaliatmdb.injection.DaggerApplicationComponent;
-import amqo.com.privaliatmdb.injection.modules.ApplicationModule;
 import amqo.com.privaliatmdb.network.MoviesEndpoint;
-import amqo.com.privaliatmdb.views.popular.MainActivity;
 
 import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
-import static android.support.test.espresso.action.ViewActions.replaceText;
+import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition;
+import static android.support.test.espresso.contrib.RecyclerViewActions.scrollToPosition;
+import static android.support.test.espresso.matcher.ViewMatchers.assertThat;
+import static android.support.test.espresso.matcher.ViewMatchers.hasDescendant;
+import static android.support.test.espresso.matcher.ViewMatchers.isAssignableFrom;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static android.support.test.espresso.matcher.ViewMatchers.withParent;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static android.support.test.internal.util.Checks.checkNotNull;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 
 @RunWith(AndroidJUnit4.class)
-public class MainActivityTest {
-
-    private final String DEFAULT_SEARCH = "Blade Runner";
-    protected final int TIMEOUT = 5000;
-
-    private UiDevice mDevice;
-    private SharedPreferences mSharedPreferences;
-
-    @Rule
-    public ActivityTestRule<MainActivity> mActivityTestRule =
-            new ActivityTestRule<>(MainActivity.class, true, false);
+public class MainActivityTest extends BaseActivityTest {
 
     @Before
     public void setUp() {
-        mDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
-
-        MoviesApplication application = MoviesApplication.getInstance();
-        ApplicationComponent applicationComponent = DaggerApplicationComponent.builder()
-                .applicationModule(new ApplicationModule(application))
-                .build();
-
-        mSharedPreferences = applicationComponent.getSharedPreferences();
-
-        mActivityTestRule.launchActivity(
-                new Intent(
-                        InstrumentationRegistry.getTargetContext(),
-                        MainActivity.class));
+        super.setUp();
     }
 
     @Test
@@ -77,76 +56,95 @@ public class MainActivityTest {
     }
 
     @Test
-    public void searchActivityTest() {
-
-        clickOnSearchFab();
-
-        ViewInteraction searchAutoComplete = onView(
-                allOf(withId(R.id.search_src_text),
-                        withParent(allOf(withId(R.id.search_plate),
-                                withParent(withId(R.id.search_edit_frame)))),
-                        isDisplayed()));
-        searchAutoComplete.perform(replaceText(DEFAULT_SEARCH), closeSoftKeyboard());
-
-        scrollRecyclerviewDown();
-
-        clickOnRemoveQueryButton();
-
-        clickOnBackButton();
+    public void mainActivity_RecyclerSize() {
+        onView(withId(R.id.list)).check(new RecyclerViewItemCountAssertion(20));
     }
 
-    private void scrollRecyclerviewDown() {
-        UiObject recyclerView = getRecyclerView();
-        UiScrollable recyclerScrollable = new UiScrollable(recyclerView.getSelector());
-        if (recyclerScrollable.exists()) {
-            try {
-                recyclerScrollable.scrollToEnd(50000);
-            } catch (UiObjectNotFoundException e) {
-                // Recyclerview not found
-                e.printStackTrace();
+    @Test
+    public void mainActivity_collapseAndClickSearch() {
+
+        onView(withId(R.id.app_bar)).perform(collapseAppBarLayout());
+
+        ViewInteraction recyclerView = onView(withId(R.id.list));
+
+        recyclerView.perform(scrollToPosition(1));
+        recyclerView.perform(actionOnItemAtPosition(1, click()));
+
+        String searchTitle = getResourceString(R.string.search_title);
+        ViewInteraction actionMenuItemView = onView(
+                allOf(withId(R.id.action_search), withContentDescription(searchTitle), isDisplayed()));
+        actionMenuItemView.perform(click());
+    }
+
+    @Test
+    public void mainActivity_rankText() {
+
+        ViewInteraction recyclerView = onView(withId(R.id.list));
+
+        recyclerView.perform(scrollToPosition(1));
+        recyclerView.perform(actionOnItemAtPosition(1, click()));
+
+        recyclerView.check(matches(atPosition(1, hasDescendant(withText("2")))));
+    }
+
+    private ViewAction collapseAppBarLayout() {
+        return new ViewAction() {
+            @Override
+            public Matcher<View> getConstraints() {
+                return isAssignableFrom(AppBarLayout.class);
             }
-        }
-    }
 
-    private UiObject getRecyclerView() {
-        UiObject recyclerView = mDevice.findObject(
-                new UiSelector().resourceId("amqo.com.privaliatmdb:id/list"));
-        mDevice.wait(Until.hasObject(By.res("amqo.com.privaliatmdb", "amqo.com.privaliatmdb:id/list")), TIMEOUT);
-        return recyclerView;
-    }
-
-    private void clickOnSearchFab() {
-        UiObject searchFabButton = mDevice.findObject(
-                new UiSelector().resourceId("amqo.com.privaliatmdb:id/fab"));
-        if (searchFabButton.exists()) {
-            try {
-                searchFabButton.click();
-            } catch (UiObjectNotFoundException e) {
-                // button not found
+            @Override
+            public String getDescription() {
+                return "Collapse App Bar Layout";
             }
-        }
-    }
 
-    private void clickOnRemoveQueryButton() {
-        UiObject removeButton = mDevice.findObject(
-                new UiSelector().resourceId("amqo.com.privaliatmdb:id/search_close_btn"));
-        if (removeButton.exists()) {
-            try {
-                removeButton.click();
-            } catch (UiObjectNotFoundException e) {
-                // button not found
+            @Override
+            public void perform(UiController uiController, View view) {
+                AppBarLayout appBarLayout = (AppBarLayout) view;
+                appBarLayout.setExpanded(false);
+                uiController.loopMainThreadUntilIdle();
             }
+        };
+    }
+
+    public class RecyclerViewItemCountAssertion implements ViewAssertion {
+        private final int expectedCount;
+
+        public RecyclerViewItemCountAssertion(int expectedCount) {
+            this.expectedCount = expectedCount;
+        }
+
+        @Override
+        public void check(View view, NoMatchingViewException noViewFoundException) {
+            if (noViewFoundException != null) {
+                throw noViewFoundException;
+            }
+
+            RecyclerView recyclerView = (RecyclerView) view;
+            RecyclerView.Adapter adapter = recyclerView.getAdapter();
+            assertThat(adapter.getItemCount(), is(expectedCount));
         }
     }
 
-    private void clickOnBackButton() {
-        UiObject toolbar = mDevice.findObject(new UiSelector().resourceId("amqo.com.privaliatmdb:id/toolbar"));
-        try {
-            UiObject backButton = toolbar.getChild(
-                    new UiSelector().className("android.widget.ImageButton"));
-            backButton.click();
-        } catch (UiObjectNotFoundException e) {
-            // button not found
-        }
+    public static Matcher<View> atPosition(final int position, @NonNull final Matcher<View> itemMatcher) {
+        checkNotNull(itemMatcher);
+        return new BoundedMatcher<View, RecyclerView>(RecyclerView.class) {
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("has item at position " + position + ": ");
+                itemMatcher.describeTo(description);
+            }
+
+            @Override
+            protected boolean matchesSafely(final RecyclerView view) {
+                RecyclerView.ViewHolder viewHolder = view.findViewHolderForAdapterPosition(position);
+                if (viewHolder == null) {
+                    // has no item on such position
+                    return false;
+                }
+                return itemMatcher.matches(viewHolder.itemView);
+            }
+        };
     }
 }

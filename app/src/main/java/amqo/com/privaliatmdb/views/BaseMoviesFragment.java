@@ -1,11 +1,15 @@
 package amqo.com.privaliatmdb.views;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.View;
 
 import javax.inject.Inject;
@@ -29,7 +33,6 @@ public abstract class BaseMoviesFragment extends Fragment
         ConnectivityReceiverContract.View,
         MoviesContract.View {
 
-    @Inject protected RecyclerView.LayoutManager mLayoutManager;
     @Inject protected MoviesAdapterContract.View mMoviesAdapter;
     @Inject protected ConnectivityNotifier mConnectivityNotifier;
 
@@ -120,7 +123,7 @@ public abstract class BaseMoviesFragment extends Fragment
 
     @Override
     public RecyclerView.LayoutManager getLayoutManager() {
-        return mLayoutManager;
+        return mRecyclerView.getLayoutManager();
     }
 
     // ConnectivityReceiverContract.View methods
@@ -158,7 +161,7 @@ public abstract class BaseMoviesFragment extends Fragment
 
     private void initRecyclerView() {
 
-        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setLayoutManager(getCustomLayoutManager());
         mRecyclerView.setAdapter((RecyclerView.Adapter) mMoviesAdapter);
     }
 
@@ -173,6 +176,28 @@ public abstract class BaseMoviesFragment extends Fragment
                         else refreshMovies();
                     }
                 });
+    }
+
+    private RecyclerView.LayoutManager getCustomLayoutManager() {
+        int gridColumns = getResources().getInteger(R.integer.grid_columns);
+
+        RecyclerView.LayoutManager layoutManager;
+        if (gridColumns <= 1) {
+            layoutManager = new LinearLayoutManager(getContext());
+            return layoutManager;
+        }
+
+        boolean isPortrait = getResources().getConfiguration().orientation
+                == Configuration.ORIENTATION_PORTRAIT;
+
+        if (isPortrait) {
+            layoutManager = new StaggeredGridLayoutManager(
+                    StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS,
+                    StaggeredGridLayoutManager.VERTICAL);
+        } else {
+            layoutManager = new GridLayoutManager(getContext(), gridColumns);
+        }
+        return layoutManager;
     }
 
     protected abstract void resetMovies();
