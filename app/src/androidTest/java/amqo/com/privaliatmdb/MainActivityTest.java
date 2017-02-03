@@ -24,16 +24,13 @@ import amqo.com.privaliatmdb.network.MoviesEndpoint;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition;
 import static android.support.test.espresso.contrib.RecyclerViewActions.scrollToPosition;
 import static android.support.test.espresso.matcher.ViewMatchers.assertThat;
-import static android.support.test.espresso.matcher.ViewMatchers.hasDescendant;
 import static android.support.test.espresso.matcher.ViewMatchers.isAssignableFrom;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static android.support.test.internal.util.Checks.checkNotNull;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
@@ -74,17 +71,6 @@ public class MainActivityTest extends BaseActivityTest {
         ViewInteraction actionMenuItemView = onView(
                 allOf(withId(R.id.action_search), withContentDescription(searchTitle), isDisplayed()));
         actionMenuItemView.perform(click());
-    }
-
-    @Test
-    public void mainActivity_rankText() {
-
-        ViewInteraction recyclerView = onView(withId(R.id.list));
-
-        recyclerView.perform(scrollToPosition(1));
-        recyclerView.perform(actionOnItemAtPosition(1, click()));
-
-        recyclerView.check(matches(atPosition(1, hasDescendant(withText("2")))));
     }
 
     private ViewAction collapseAppBarLayout() {
