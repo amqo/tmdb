@@ -22,7 +22,7 @@ public class MoviesConfigurationImages {
         return mPosterSizes;
     }
 
-    @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     public void setPosterSizes(List<String> sizes) {
         mPosterSizes = sizes;
     }

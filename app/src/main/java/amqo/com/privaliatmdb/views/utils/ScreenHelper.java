@@ -1,9 +1,12 @@
 package amqo.com.privaliatmdb.views.utils;
 
 import android.app.Activity;
+import android.support.annotation.VisibleForTesting;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.WindowManager;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -23,7 +26,8 @@ public class ScreenHelper {
         String imageSize = "";
         // To avoid near values going to the next too high density
         int screenSize = getScreenDensity() - 50;
-        for (String size : moviesConfiguration.getSizes()) {
+        List<String> sizes = moviesConfiguration.getSizes();
+        for (String size : sizes) {
             try {
                 int sizeInt = Integer.valueOf(size.substring(1, size.length()));
                 if (sizeInt > screenSize) {
@@ -31,14 +35,16 @@ public class ScreenHelper {
                     break;
                 }
             } catch (NumberFormatException e) {
-                imageSize = size;
+                imageSize = sizes.get(sizes.size() - 1);
                 break;
             }
         }
         return imageSize;
     }
 
-    private int getScreenDensity() {
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    public int getScreenDensity() {
+
         WindowManager windowManager = mActivity.getWindowManager();
         Display display = windowManager.getDefaultDisplay();
         DisplayMetrics metrics = new DisplayMetrics();

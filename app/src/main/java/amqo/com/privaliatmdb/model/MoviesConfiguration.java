@@ -19,7 +19,7 @@ public class MoviesConfiguration {
         return mMoviesConfigurationImages.getPosterSizes();
     }
 
-    @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     public void setSizes(List<String> sizes) {
         if (mMoviesConfigurationImages == null)
             mMoviesConfigurationImages = new MoviesConfigurationImages();

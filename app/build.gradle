@@ -21,8 +21,8 @@ android {
         applicationId "amqo.com.privaliatmdb"
         minSdkVersion 22
         targetSdkVersion 25
-        versionCode 5
-        versionName "1.04"
+        versionCode 6
+        versionName "1.05"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

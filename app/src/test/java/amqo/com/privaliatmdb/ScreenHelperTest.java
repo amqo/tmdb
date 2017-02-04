@@ -1,5 +1,9 @@
 package amqo.com.privaliatmdb;
 
+import android.app.Activity;
+import android.view.Display;
+import android.view.WindowManager;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,11 +14,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import amqo.com.privaliatmdb.model.MoviesConfiguration;
-import amqo.com.privaliatmdb.model.contracts.MoviesContract;
 import amqo.com.privaliatmdb.views.utils.ScreenHelper;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -23,61 +28,72 @@ public class ScreenHelperTest {
 
     private final int DEFAULT_DENSITY = 100;
 
-    @Mock
-    MoviesContract.View mViewMock;
-    @Mock
-    MoviesConfiguration mMoviesConfigurationMock;
+    @Mock Activity mActivityMock;
+    @Mock WindowManager mWindowManagerMock;
+    @Mock Display mDisplayMock;
 
+    @Mock MoviesConfiguration mMoviesConfigurationMock;
+
+    ScreenHelper mScreenHelper;
+    ScreenHelper mScreenHelperSpy;
     MoviesConfiguration mMoviesConfiguration;
 
     @Before
     public void setUp() {
         mMoviesConfiguration = new MoviesConfiguration();
         mMoviesConfiguration.setSizes(getSizes());
+
+        mScreenHelper = new ScreenHelper(mActivityMock);
+        mScreenHelperSpy = spy(mScreenHelper);
     }
 
     @Test
     public void getCorrectImageSize_callVerify() {
-        when(mViewMock.getScreenDensity()).thenReturn(DEFAULT_DENSITY);
-        ScreenHelper.getCorrectImageSize(mViewMock, mMoviesConfigurationMock);
-        verify(mViewMock).getScreenDensity();
+
+        when(mActivityMock.getWindowManager()).thenReturn(mWindowManagerMock);
+        when(mWindowManagerMock.getDefaultDisplay()).thenReturn(mDisplayMock);
+
+        mScreenHelper.getCorrectImageSize(mMoviesConfigurationMock);
+
         verify(mMoviesConfigurationMock).getSizes();
+        verify(mActivityMock).getWindowManager();
+        verify(mWindowManagerMock).getDefaultDisplay();
     }
 
     @Test
     public void getCorrectImageSize_getFirstSize() {
 
-        when(mViewMock.getScreenDensity()).thenReturn(DEFAULT_DENSITY);
-        String size = ScreenHelper.getCorrectImageSize(mViewMock, mMoviesConfiguration);
+        doReturn(DEFAULT_DENSITY).when(mScreenHelperSpy).getScreenDensity();
+        String size = mScreenHelperSpy.getCorrectImageSize(mMoviesConfiguration);
         assertThat(size, is(getSizes().get(0)));
     }
 
     @Test
     public void getCorrectImageSize_getSecondSize() {
 
-        when(mViewMock.getScreenDensity()).thenReturn(200);
-        String size = ScreenHelper.getCorrectImageSize(mViewMock, mMoviesConfiguration);
+        doReturn(200).when(mScreenHelperSpy).getScreenDensity();
+        String size = mScreenHelperSpy.getCorrectImageSize(mMoviesConfiguration);
         assertThat(size, is(getSizes().get(1)));
     }
 
     @Test
     public void getCorrectImageSize_getLastSize() {
 
-        when(mViewMock.getScreenDensity()).thenReturn(1300);
-        String size = ScreenHelper.getCorrectImageSize(mViewMock, mMoviesConfiguration);
+        doReturn(1300).when(mScreenHelperSpy).getScreenDensity();
+        String size = mScreenHelperSpy.getCorrectImageSize(mMoviesConfiguration);
         List<String> sizes = getSizes();
-        assertThat(size, is(sizes.get(sizes.size() - 1)));
+        assertThat(size, is(getSizes().get(sizes.size() - 1)));
     }
 
     @Test
     public void getCorrectImageSize_getFistWhenDifferent() {
 
-        when(mViewMock.getScreenDensity()).thenReturn(1300);
+        doReturn(1300).when(mScreenHelperSpy).getScreenDensity();
         List<String> sizes = getDifferentSizes();
         mMoviesConfiguration.setSizes(sizes);
 
-        String size = ScreenHelper.getCorrectImageSize(mViewMock, mMoviesConfiguration);
-        assertThat(size, is(sizes.get(0)));
+        String size = mScreenHelperSpy.getCorrectImageSize(mMoviesConfiguration);
+        assertThat(size, is(getSizes().get(sizes.size() - 1)));
     }
 
     private List<String> getSizes() {
