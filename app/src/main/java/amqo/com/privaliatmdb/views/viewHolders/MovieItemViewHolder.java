@@ -21,6 +21,8 @@ public class MovieItemViewHolder extends RecyclerView.ViewHolder {
     public View mImageContainerView;
     @BindView(R.id.title)
     public TextView mTitleView;
+    @BindView(R.id.year)
+    public TextView mYearView;
     @BindView(R.id.title_rank)
     public TextView mTitleRankView;
     @BindView(R.id.overview)

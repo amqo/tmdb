@@ -66,7 +66,8 @@ public class MoviesRecyclerViewAdapter
 
         holder.mItem = movie;
 
-        holder.mTitleView.setText(movie.getTitleWithYear());
+        holder.mTitleView.setText(movie.getTitle());
+        holder.mYearView.setText(movie.getReleaseYear());
         holder.mTitleRankView.setText(Integer.toString(position + 1));
         holder.mOverView.setText(movie.getOverview());
 

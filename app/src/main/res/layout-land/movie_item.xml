@@ -15,47 +15,78 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_margin="16dp"
             android:layout_weight="3"
             android:orientation="vertical">
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/text_margin"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-                <TextView
-                    android:id="@+id/title_rank"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:id="@+id/details_container"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
-                    android:textColor="@android:color/black"
-                    android:drawableRight="@drawable/ic_local_movies"
-                    android:textStyle="bold" />
+                    android:layout_alignParentStart="true"
+                    android:layout_toLeftOf="@id/image_rating"
+                    android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="18dp"
-                    android:textColor="@color/dark_gray"
-                    android:gravity="center"
-                    android:textAppearance="?attr/textAppearanceListItem"
-                    android:textStyle="bold" />
+                    <TextView
+                        android:id="@+id/title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:textAppearance="?attr/textAppearanceListItem"
+                        android:textColor="@color/dark_gray"
+                        android:textSize="20dp"
+                        android:textStyle="bold" />
 
-            </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/title_rank"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:drawableRight="@drawable/ic_local_movies"
+                            android:gravity="center_vertical"
+                            android:textColor="@android:color/black" />
+
+                        <TextView
+                            android:id="@+id/year"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:gravity="center_vertical"
+                            android:textSize="16dp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <amqo.com.privaliatmdb.views.RatingMovieView
+                    xmlns:rating="http://schemas.android.com/apk/res/amqo.com.privaliatmdb"
+                    android:id="@+id/image_rating"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_alignParentEnd="true"
+                    android:visibility="gone"
+                    rating:ratingTextSize="12sp" />
+
+            </RelativeLayout>
 
             <TextView
                 android:id="@+id/overview"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/text_margin"
-                android:textAppearance="?attr/textAppearanceListItem" />
+                android:layout_marginTop="16dp"
+                android:textAppearance="?attr/textAppearanceListItem"
+                android:textSize="12dp" />
 
         </LinearLayout>
 
@@ -63,7 +94,9 @@
             android:id="@+id/image_container"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
+            android:layout_marginBottom="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="16dp"
             android:layout_weight="1"
             card_view:cardCornerRadius="6dp">
 
@@ -73,16 +106,6 @@
                 android:layout_height="wrap_content"
                 android:adjustViewBounds="true"
                 android:scaleType="centerCrop" />
-
-            <amqo.com.privaliatmdb.views.RatingMovieView
-                xmlns:rating="http://schemas.android.com/apk/res/amqo.com.privaliatmdb"
-                android:id="@+id/image_rating"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_gravity="top|end"
-                android:visibility="gone"
-                rating:ratingTextSize="8sp"
-                android:layout_margin="4dp" />
 
         </android.support.v7.widget.CardView>
 
