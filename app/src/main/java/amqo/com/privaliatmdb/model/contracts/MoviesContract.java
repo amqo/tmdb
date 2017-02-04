@@ -2,6 +2,7 @@ package amqo.com.privaliatmdb.model.contracts;
 
 import amqo.com.privaliatmdb.model.Movie;
 import amqo.com.privaliatmdb.model.Movies;
+import amqo.com.privaliatmdb.model.MoviesConfiguration;
 
 public interface MoviesContract {
 
@@ -11,7 +12,7 @@ public interface MoviesContract {
 
         void setLoading(boolean loading);
 
-        int getScreenDensity();
+        String getCorrectImageSize(MoviesConfiguration moviesConfiguration);
 
         void onMovieInteraction(Movie movie);
 

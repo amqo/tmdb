@@ -1,5 +1,6 @@
 package amqo.com.privaliatmdb.injection.modules;
 
+import android.app.Activity;
 import android.content.SharedPreferences;
 
 import amqo.com.privaliatmdb.injection.scopes.PerFragment;
@@ -23,6 +24,11 @@ public class MoviesModule {
 
     public MoviesModule(MoviesFragment fragment) {
         mMoviesFragment = fragment;
+    }
+
+    @Provides @PerFragment
+    Activity providesActivity() {
+        return mMoviesFragment.getActivity();
     }
 
     @Provides @PerFragment

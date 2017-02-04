@@ -1,24 +1,28 @@
 package amqo.com.privaliatmdb.views.utils;
 
 import android.app.Activity;
-import android.content.Context;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.WindowManager;
 
-import amqo.com.privaliatmdb.MoviesApplication;
+import javax.inject.Inject;
+
 import amqo.com.privaliatmdb.model.MoviesConfiguration;
-import amqo.com.privaliatmdb.model.contracts.MoviesContract;
 
-public abstract class ScreenHelper {
+public class ScreenHelper {
 
-    public static String getCorrectImageSize(
-            MoviesContract.View view,
-            MoviesConfiguration moviesConfiguration) {
+    private Activity mActivity;
+
+    @Inject
+    public ScreenHelper(Activity activity) {
+        mActivity = activity;
+    }
+
+    public String getCorrectImageSize(MoviesConfiguration moviesConfiguration) {
 
         String imageSize = "";
         // To avoid near values going to the next too high density
-        int screenSize = view.getScreenDensity() - 50;
+        int screenSize = getScreenDensity() - 50;
         for (String size : moviesConfiguration.getSizes()) {
             try {
                 int sizeInt = Integer.valueOf(size.substring(1, size.length()));
@@ -33,17 +37,9 @@ public abstract class ScreenHelper {
         }
         return imageSize;
     }
-    public static int getScreenWidthPixels() {
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        WindowManager windowmanager = (WindowManager) MoviesApplication
-                .getInstance().getSystemService(Context.WINDOW_SERVICE);
-        windowmanager.getDefaultDisplay().getMetrics(displayMetrics);
-        return displayMetrics.widthPixels;
-    }
 
-
-    public static int getScreenDensity(Activity activity) {
-        WindowManager windowManager = activity.getWindowManager();
+    private int getScreenDensity() {
+        WindowManager windowManager = mActivity.getWindowManager();
         Display display = windowManager.getDefaultDisplay();
         DisplayMetrics metrics = new DisplayMetrics();
         display.getMetrics(metrics);

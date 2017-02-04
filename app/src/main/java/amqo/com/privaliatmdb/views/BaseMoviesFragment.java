@@ -18,6 +18,7 @@ import amqo.com.privaliatmdb.MoviesApplication;
 import amqo.com.privaliatmdb.R;
 import amqo.com.privaliatmdb.model.Movie;
 import amqo.com.privaliatmdb.model.Movies;
+import amqo.com.privaliatmdb.model.MoviesConfiguration;
 import amqo.com.privaliatmdb.model.contracts.ConnectivityReceiverContract;
 import amqo.com.privaliatmdb.model.contracts.MoviesAdapterContract;
 import amqo.com.privaliatmdb.model.contracts.MoviesContract;
@@ -35,6 +36,7 @@ public abstract class BaseMoviesFragment extends Fragment
 
     @Inject protected MoviesAdapterContract.View mMoviesAdapter;
     @Inject protected ConnectivityNotifier mConnectivityNotifier;
+    @Inject protected ScreenHelper mScreenHelper;
 
     @BindView(R.id.list_refresh)
     protected SwipeRefreshLayout mSwipeRefreshLayout;
@@ -85,8 +87,8 @@ public abstract class BaseMoviesFragment extends Fragment
     }
 
     @Override
-    public int getScreenDensity() {
-        return ScreenHelper.getScreenDensity(getActivity());
+    public String getCorrectImageSize(MoviesConfiguration moviesConfiguration) {
+        return mScreenHelper.getCorrectImageSize(moviesConfiguration);
     }
 
     @Override

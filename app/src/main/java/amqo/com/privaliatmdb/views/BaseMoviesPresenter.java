@@ -8,7 +8,6 @@ import amqo.com.privaliatmdb.model.MoviesConfiguration;
 import amqo.com.privaliatmdb.model.contracts.MoviesContract;
 import amqo.com.privaliatmdb.network.MovieParameterCreator;
 import amqo.com.privaliatmdb.network.MoviesEndpoint;
-import amqo.com.privaliatmdb.views.utils.ScreenHelper;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
@@ -82,7 +81,7 @@ public abstract class BaseMoviesPresenter {
                 editor.putString(MoviesEndpoint.BASE_IMAGE_API_KEY,
                         moviesConfiguration.getBaseUrl());
 
-                String imageSize = ScreenHelper.getCorrectImageSize(mMoviesView, moviesConfiguration);
+                String imageSize = mMoviesView.getCorrectImageSize(moviesConfiguration);
                 editor.putString(MoviesEndpoint.BASE_IMAGE_SIZE_KEY, imageSize);
                 editor.commit();
 
