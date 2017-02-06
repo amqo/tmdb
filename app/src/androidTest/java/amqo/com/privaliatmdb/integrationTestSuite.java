@@ -5,7 +5,6 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-        BaseActivityTest.class,
         MainActivityTest.class,
         SearchActivityTest.class
 })
