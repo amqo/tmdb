@@ -10,6 +10,7 @@ import amqo.com.privaliatmdb.network.MovieParameterCreator;
 import amqo.com.privaliatmdb.network.MoviesEndpoint;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
@@ -62,6 +63,7 @@ public abstract class BaseMoviesPresenter implements MoviesContract.Presenter {
     }
 
     protected void initMoviesConsumer() {
+
         mMoviesConsumer = new Consumer<Movies>() {
             @Override
             public void accept(Movies movies) throws Exception {
@@ -72,6 +74,7 @@ public abstract class BaseMoviesPresenter implements MoviesContract.Presenter {
     }
 
     protected void initMoviesConfigurationConsumer() {
+
         mMoviesConfigurationConsumer = new Consumer<MoviesConfiguration>() {
             @Override
             public void accept(MoviesConfiguration moviesConfiguration) throws Exception {
@@ -93,5 +96,20 @@ public abstract class BaseMoviesPresenter implements MoviesContract.Presenter {
                 mMoviesView.refreshMovies();
             }
         };
+    }
+
+    protected void doSearch(Observable<Movies> moviesObservable) {
+
+        moviesObservable
+                .doOnComplete(new Action() {
+                    @Override
+                    public void run() throws Exception {
+                        mMoviesView.setLoading(false);
+                    }
+                })
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .onErrorReturnItem(new Movies())
+                .subscribe(mMoviesConsumer);
     }
 }

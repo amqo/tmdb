@@ -53,6 +53,8 @@ public class MoviesRecyclerViewAdapter
         mMoviesPresenter = presenter;
     }
 
+    // RecyclerView.Adapter<MovieItemViewHolder> methods
+
     @Override
     public MovieItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
@@ -86,6 +88,8 @@ public class MoviesRecyclerViewAdapter
     public int getItemCount() {
         return mValues.size();
     }
+
+    // MoviesAdapterContract.View methods
 
     @Override
     public void refreshMovies(Movies movies) {
