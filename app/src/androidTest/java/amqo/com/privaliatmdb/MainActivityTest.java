@@ -11,7 +11,6 @@ import android.support.test.runner.AndroidJUnit4;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.TextView;
 
 import org.hamcrest.Matcher;
 import org.junit.Before;
@@ -115,26 +114,6 @@ public class MainActivityTest extends BaseActivityTest {
             RecyclerView recyclerView = (RecyclerView) view;
             RecyclerView.Adapter adapter = recyclerView.getAdapter();
             assertThat(adapter.getItemCount(), is(expectedCount));
-        }
-    }
-
-    private class RecyclerViewRankAssertion implements ViewAssertion {
-        private final String expectedRank;
-
-        public RecyclerViewRankAssertion(String expectedRank) {
-            this.expectedRank = expectedRank;
-        }
-
-        @Override
-        public void check(View view, NoMatchingViewException noViewFoundException) {
-            if (noViewFoundException != null) {
-                throw noViewFoundException;
-            }
-
-            RecyclerView recyclerView = (RecyclerView) view;
-            View viewHolder = recyclerView.getLayoutManager().getChildAt(0);
-            TextView rankText = (TextView) viewHolder.findViewById(R.id.title_rank);
-            assertThat(rankText.getText().toString(), is(expectedRank));
         }
     }
 }
