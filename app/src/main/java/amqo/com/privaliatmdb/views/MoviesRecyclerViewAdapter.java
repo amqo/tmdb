@@ -1,5 +1,6 @@
 package amqo.com.privaliatmdb.views;
 
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -128,67 +129,9 @@ public class MoviesRecyclerViewAdapter
         }
 
         RequestListener<String, GlideDrawable> requestListener =
-                new RequestListener<String, GlideDrawable>() {
-                    @Override
-                    public boolean onException(
-                            Exception e, String model, Target<GlideDrawable> target,
-                            boolean isFirstResource) {
-                        holder.mImageContainerView.setVisibility(View.GONE);
-                        // Get configuration again, as this error should occur if configuration changed in the API
-                        mMoviesPresenter.updateMoviesConfiguration();
-                        return false;
-                    }
+                getDrawableRequestListener(holder, movie);
 
-                    @Override
-                    public boolean onResourceReady(
-                            GlideDrawable resource, String model,
-                            Target<GlideDrawable> target, boolean isFromMemoryCache,
-                            boolean isFirstResource) {
-                        holder.mImageContainerView.setVisibility(View.VISIBLE);
-                        float rating = movie.getVoteAverage();
-                        // Show only movies with rating, 0.0 meaning no ratings (most of the times)
-                        if (rating != 0.0) {
-                            //Show decimals only when they are different than 0
-                            String rating_s = rating == Math.ceil(rating) ?
-                                    Integer.toString((int)rating) : Float.toString(rating);
-                            holder.mRatingMovieView.setRating(rating_s);
-                            holder.mRatingMovieView.setVisibility(View.VISIBLE);
-                        }
-                        return false;
-                    }
-                };
-
-        boolean auto = mImageWidth == 0 || mImageHeight == 0;
-        if (auto) {
-            // Add layout change listener only if a previous listener didn't fire before
-            View.OnLayoutChangeListener layoutChangeListener = new View.OnLayoutChangeListener() {
-                @Override
-                public void onLayoutChange(View view, int i, int i1, int width, int height, int i4, int i5, int i6, int i7) {
-                    if (width > 0 && height > 0) {
-                        float ratio = (float)height / width;
-                        // To understand this constants, please check https://www.themoviedb.org/documentation/editing/images
-                        if (ratio < 1.60 && ratio > 1.40) {
-                            mImageWidth = width;
-                            mImageHeight = height;
-
-                            // Ass we already have what we wanted, we can remove all listeners
-                            for (ImageView imageView : mCurrentLayoutListeners.keySet()) {
-                                imageView.removeOnLayoutChangeListener(mCurrentLayoutListeners.get(imageView));
-                            }
-                            mCurrentLayoutListeners.clear();
-                        }
-                    }
-                }
-            };
-            mCurrentLayoutListeners.put(holder.mImageView, layoutChangeListener);
-            holder.mImageView.addOnLayoutChangeListener(layoutChangeListener);
-        } else {
-            // If we got the width and height of images, we force the layout to avoid "jumps"
-            ViewGroup.LayoutParams params = holder.mImageView.getLayoutParams();
-            params.height = mImageHeight;
-            params.width = mImageWidth;
-            holder.mImageView.setLayoutParams(params);
-        }
+        setHolderImageLayout(holder);
 
         holder.mRatingMovieView.setVisibility(View.GONE);
 
@@ -199,9 +142,83 @@ public class MoviesRecyclerViewAdapter
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .listener(requestListener);
 
-
         builder.placeholder(R.drawable.cinema_placeholder);
 
         builder.into(holder.mImageView);
+    }
+
+    private void setHolderImageLayout(MovieItemViewHolder holder) {
+        boolean auto = mImageWidth == 0 || mImageHeight == 0;
+        if (auto) {
+            // Add layout change listener only if a previous listener didn't fire before
+            View.OnLayoutChangeListener layoutChangeListener = getOnLayoutChangeListener();
+
+            mCurrentLayoutListeners.put(holder.mImageView, layoutChangeListener);
+            holder.mImageView.addOnLayoutChangeListener(layoutChangeListener);
+        } else {
+            // If we got the width and height of images, we force the layout to avoid "jumps"
+            ViewGroup.LayoutParams params = holder.mImageView.getLayoutParams();
+            params.height = mImageHeight;
+            params.width = mImageWidth;
+            holder.mImageView.setLayoutParams(params);
+        }
+    }
+
+    @NonNull
+    private View.OnLayoutChangeListener getOnLayoutChangeListener() {
+        return new View.OnLayoutChangeListener() {
+                    @Override
+                    public void onLayoutChange(View view, int i, int i1, int width, int height, int i4, int i5, int i6, int i7) {
+                        if (width > 0 && height > 0) {
+                            float ratio = (float)height / width;
+                            // To understand this constants, please check https://www.themoviedb.org/documentation/editing/images
+                            if (ratio < 1.60 && ratio > 1.40) {
+                                mImageWidth = width;
+                                mImageHeight = height;
+
+                                // Ass we already have what we wanted, we can remove all listeners
+                                for (ImageView imageView : mCurrentLayoutListeners.keySet()) {
+                                    imageView.removeOnLayoutChangeListener(mCurrentLayoutListeners.get(imageView));
+                                }
+                                mCurrentLayoutListeners.clear();
+                            }
+                        }
+                    }
+                };
+    }
+
+    @NonNull
+    private RequestListener<String, GlideDrawable> getDrawableRequestListener(
+            final MovieItemViewHolder holder, final Movie movie) {
+
+        return new RequestListener<String, GlideDrawable>() {
+            @Override
+            public boolean onException(
+                    Exception e, String model, Target<GlideDrawable> target,
+                    boolean isFirstResource) {
+                holder.mImageContainerView.setVisibility(View.GONE);
+                // Get configuration again, as this error should occur if configuration changed in the API
+                mMoviesPresenter.updateMoviesConfiguration();
+                return false;
+            }
+
+            @Override
+            public boolean onResourceReady(
+                    GlideDrawable resource, String model,
+                    Target<GlideDrawable> target, boolean isFromMemoryCache,
+                    boolean isFirstResource) {
+                holder.mImageContainerView.setVisibility(View.VISIBLE);
+                float rating = movie.getVoteAverage();
+                // Show only movies with rating, 0.0 meaning no ratings (most of the times)
+                if (rating != 0.0) {
+                    //Show decimals only when they are different than 0
+                    String rating_s = rating == Math.ceil(rating) ?
+                            Integer.toString((int)rating) : Float.toString(rating);
+                    holder.mRatingMovieView.setRating(rating_s);
+                    holder.mRatingMovieView.setVisibility(View.VISIBLE);
+                }
+                return false;
+            }
+        };
     }
 }
