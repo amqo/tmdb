@@ -64,6 +64,8 @@ public class SearchMoviesFragment extends BaseMoviesFragment
 
         MoviesApplication.getInstance().getSearchMoviesComponent().inject(this);
 
+        mBasePresenter = mMoviesPresenter;
+
         mRecyclerView.addOnScrollListener(mScrollListener);
 
         boolean connected = mConnectivityNotifier.isConnected();

@@ -42,6 +42,8 @@ public class MoviesFragment extends BaseMoviesFragment
 
         MoviesApplication.getInstance().getMoviesComponent().inject(this);
 
+        mBasePresenter = mMoviesPresenter;
+
         mUpFAB = (FloatingActionButton) view.findViewById(R.id.up_fab);
         mFabUpPresenter.setUpFab(mUpFAB);
 

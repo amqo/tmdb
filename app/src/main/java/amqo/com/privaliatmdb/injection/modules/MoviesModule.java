@@ -69,6 +69,7 @@ public class MoviesModule {
     MoviesAdapterContract.View providesMoviesAdapterView(
             MoviesContract.View moviesView,
             MoviesContract.PresenterPopular presenter) {
+
         return new MoviesRecyclerViewAdapter(moviesView, presenter);
     }
 }

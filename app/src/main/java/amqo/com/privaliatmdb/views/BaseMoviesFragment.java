@@ -43,6 +43,8 @@ public abstract class BaseMoviesFragment extends Fragment
     @BindView(R.id.list)
     protected RecyclerView mRecyclerView;
 
+    protected MoviesContract.Presenter mBasePresenter;
+
     protected boolean mIsLoading = false;
     protected boolean mIsRefreshing = false;
     protected boolean mNeedRefresh = false;
@@ -114,13 +116,13 @@ public abstract class BaseMoviesFragment extends Fragment
     @Override
     public void loadMoreMovies() {
         if(!mConnectivityNotifier.isConnected()) return;
-        int lastPageLoaded = mMoviesAdapter.getLastPageLoaded();
+        int lastPageLoaded = mBasePresenter.getLastPageLoaded();
         loadMoreMoviesInPage(lastPageLoaded + 1);
     }
 
     @Override
     public boolean isInLastPage() {
-        return mMoviesAdapter.isInLastPage();
+        return mBasePresenter.isInLastPage();
     }
 
     @Override

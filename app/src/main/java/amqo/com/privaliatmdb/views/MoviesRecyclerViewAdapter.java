@@ -39,8 +39,6 @@ public class MoviesRecyclerViewAdapter
     private int mImageWidth = 0;
     private int mImageHeight = 0;
 
-    private Movies mLastReceivedMovies;
-
     private Map<ImageView, View.OnLayoutChangeListener>
             mCurrentLayoutListeners = new HashMap<>();
 
@@ -106,18 +104,6 @@ public class MoviesRecyclerViewAdapter
         int previousSize = mValues.size();
         mValues.addAll(movies.getMovies());
         notifyItemRangeInserted(previousSize, mValues.size());
-        mLastReceivedMovies = movies;
-    }
-
-    @Override
-    public int getLastPageLoaded() {
-        return mLastReceivedMovies.getPage();
-    }
-
-    @Override
-    public boolean isInLastPage() {
-        if (mLastReceivedMovies == null) return true;
-        return mLastReceivedMovies.getTotalPages() == mLastReceivedMovies.getPage();
     }
 
     private void loadImageForMovie(final MovieItemViewHolder holder, final Movie movie) {

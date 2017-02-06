@@ -25,8 +25,12 @@ public abstract class BaseMoviesPresenter implements MoviesContract.Presenter {
 
     protected String mImageBaseUrl;
 
+    private Movies mLastReceivedMovies;
+
     protected boolean mLoadingConfiguration = false;
     protected boolean mConfigurationLoaded = false;
+
+    // MoviesContract.Presenter methods
 
     @Override
     public String getMovieImagesBaseUrl() {
@@ -62,6 +66,17 @@ public abstract class BaseMoviesPresenter implements MoviesContract.Presenter {
                 .subscribe(mMoviesConfigurationConsumer);
     }
 
+    @Override
+    public int getLastPageLoaded() {
+        return mLastReceivedMovies.getPage();
+    }
+
+    @Override
+    public boolean isInLastPage() {
+        if (mLastReceivedMovies == null) return true;
+        return mLastReceivedMovies.getTotalPages() == mLastReceivedMovies.getPage();
+    }
+
     protected void initMoviesConsumer() {
 
         mMoviesConsumer = new Consumer<Movies>() {
@@ -69,6 +84,7 @@ public abstract class BaseMoviesPresenter implements MoviesContract.Presenter {
             public void accept(Movies movies) throws Exception {
                 if (movies == null || movies.getMovies().isEmpty()) return;
                 mMoviesView.onMoviesLoaded(movies);
+                mLastReceivedMovies = movies;
             }
         };
     }

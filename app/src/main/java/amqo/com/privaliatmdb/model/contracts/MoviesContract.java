@@ -26,9 +26,13 @@ public interface MoviesContract {
 
     interface Presenter {
 
+        String getMovieImagesBaseUrl();
+
         void updateMoviesConfiguration();
 
-        String getMovieImagesBaseUrl();
+        int getLastPageLoaded();
+
+        boolean isInLastPage();
     }
 
     interface PresenterPopular extends  Presenter{
