@@ -8,8 +8,6 @@ public interface MoviesContract {
 
     interface View {
 
-        void refreshMovies();
-
         void setLoading(boolean loading);
 
         String getCorrectImageSize(MoviesConfiguration moviesConfiguration);
@@ -17,11 +15,8 @@ public interface MoviesContract {
         void onMovieInteraction(Movie movie);
 
         void onMoviesLoaded(Movies movies);
-    }
 
-    interface ViewSearch extends View {
-
-        void refreshMovies(String query);
+        void clearMovies();
     }
 
     interface Presenter {
@@ -30,18 +25,13 @@ public interface MoviesContract {
 
         void updateMoviesConfiguration();
 
-        int getLastPageLoaded();
+        void loadMoreMovies();
 
-        boolean isInLastPage();
+        void refreshMovies();
     }
 
-    interface PresenterPopular extends  Presenter{
+    interface PresenterSearch extends Presenter {
 
-        void getMovies(int page);
-    }
-
-    interface PresenterSearch extends  Presenter {
-
-        void searchMovies(int page, String query);
+        void setNewQuery(String query);
     }
 }

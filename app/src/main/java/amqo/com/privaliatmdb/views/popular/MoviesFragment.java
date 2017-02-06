@@ -16,14 +16,14 @@ import amqo.com.privaliatmdb.model.contracts.MoviesFabUpContract;
 import amqo.com.privaliatmdb.views.BaseMoviesFragment;
 
 public class MoviesFragment extends BaseMoviesFragment
-        implements MoviesFabUpContract.View {
+        implements MoviesFabUpContract.Presenter {
 
-    @Inject MoviesContract.PresenterPopular mMoviesPresenter;
+    @Inject MoviesContract.Presenter mMoviesPresenter;
 
     // Here the injection is for the implementation of the Contracts
     // This is to make constructor injection work
     @Inject MoviesScrollListener mScrollListener;
-    @Inject FabUpPresenter mFabUpPresenter;
+    @Inject FabUpView mFabUpView;
 
     private FloatingActionButton mUpFAB;
 
@@ -42,42 +42,38 @@ public class MoviesFragment extends BaseMoviesFragment
 
         MoviesApplication.getInstance().getMoviesComponent().inject(this);
 
-        mBasePresenter = mMoviesPresenter;
-
         mUpFAB = (FloatingActionButton) view.findViewById(R.id.up_fab);
-        mFabUpPresenter.setUpFab(mUpFAB);
+        mFabUpView.setUpFab(mUpFAB);
 
-        mScrollListener.setPresenter(mFabUpPresenter);
+        mScrollListener.setFabUpView(mFabUpView);
 
         mRecyclerView.addOnScrollListener(mScrollListener);
 
-        if(mConnectivityNotifier.isConnected()) {
-            mMoviesPresenter.getMovies(1);
-        }
+        refreshMovies();
 
         return view;
     }
 
     // Parent abstract methods
 
-    protected void resetMovies() {
-        setLoading(true);
-        mIsRefreshing = true;
-        mMoviesPresenter.getMovies(1);
-    }
-
+    @Override
     protected void movieInteraction(Movie movie) {
 
     }
 
-    protected void loadMoreMoviesInPage(int page) {
-        mMoviesPresenter.getMovies(page);
+    @Override
+    protected void refreshMovies() {
+        if (mConnectivityNotifier.isConnected()) {
+            mMoviesPresenter.refreshMovies();
+        }
     }
 
-    // MoviesFabUpContract.View methods
+    // MoviesFabUpContract.Presenter methods
 
     @Override
     public void scrollUp() {
+
         mRecyclerView.scrollToPosition(0);
     }
+
 }

@@ -13,11 +13,11 @@ public class SearchQueryListener implements SearchView.OnQueryTextListener {
     private Handler mQueryHandler = new Handler();
     private Runnable mQueryRunnable;
 
-    private MoviesContract.ViewSearch mMoviesView;
+    private MoviesContract.PresenterSearch mMoviesPresenter;
 
     @Inject
-    public SearchQueryListener(MoviesContract.ViewSearch moviesView) {
-        mMoviesView = moviesView;
+    public SearchQueryListener(MoviesContract.Presenter moviesPresenter) {
+        mMoviesPresenter = (MoviesContract.PresenterSearch) moviesPresenter;
     }
 
     @Override
@@ -34,7 +34,8 @@ public class SearchQueryListener implements SearchView.OnQueryTextListener {
         mQueryRunnable = new Runnable() {
             @Override
             public void run() {
-                mMoviesView.refreshMovies(newText);
+                mMoviesPresenter.setNewQuery(newText);
+                mMoviesPresenter.refreshMovies();
             }
         };
 

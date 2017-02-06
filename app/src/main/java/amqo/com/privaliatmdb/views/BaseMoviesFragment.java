@@ -30,11 +30,11 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public abstract class BaseMoviesFragment extends Fragment
-    implements MoviesScrollContract.View,
-        ConnectivityReceiverContract.View,
+    implements MoviesScrollContract,
+        ConnectivityReceiverContract.Listener,
         MoviesContract.View {
 
-    @Inject protected MoviesAdapterContract.View mMoviesAdapter;
+    @Inject protected MoviesAdapterContract mMoviesAdapter;
     @Inject protected ConnectivityNotifier mConnectivityNotifier;
     @Inject protected ScreenHelper mScreenHelper;
 
@@ -42,8 +42,6 @@ public abstract class BaseMoviesFragment extends Fragment
     protected SwipeRefreshLayout mSwipeRefreshLayout;
     @BindView(R.id.list)
     protected RecyclerView mRecyclerView;
-
-    protected MoviesContract.Presenter mBasePresenter;
 
     protected boolean mIsLoading = false;
     protected boolean mIsRefreshing = false;
@@ -68,12 +66,6 @@ public abstract class BaseMoviesFragment extends Fragment
     }
 
     // MoviesContract.View methods
-
-    @Override
-    public void refreshMovies() {
-        if (!mConnectivityNotifier.isConnected()) return;
-        resetMovies();
-    }
 
     @Override
     public void setLoading(boolean loading) {
@@ -106,7 +98,12 @@ public abstract class BaseMoviesFragment extends Fragment
         } else mMoviesAdapter.addMovies(movies);
     }
 
-    // MoviesScrollContract.View methods
+    @Override
+    public void clearMovies() {
+        mMoviesAdapter.refreshMovies(new Movies());
+    }
+
+    // MoviesScrollContract methods
 
     @Override
     public boolean isLoading() {
@@ -114,23 +111,11 @@ public abstract class BaseMoviesFragment extends Fragment
     }
 
     @Override
-    public void loadMoreMovies() {
-        if(!mConnectivityNotifier.isConnected()) return;
-        int lastPageLoaded = mBasePresenter.getLastPageLoaded();
-        loadMoreMoviesInPage(lastPageLoaded + 1);
-    }
-
-    @Override
-    public boolean isInLastPage() {
-        return mBasePresenter.isInLastPage();
-    }
-
-    @Override
     public RecyclerView.LayoutManager getLayoutManager() {
         return mRecyclerView.getLayoutManager();
     }
 
-    // ConnectivityReceiverContract.View methods
+    // ConnectivityReceiverContract.Listener methods
 
     @Override
     public void onNetworkConnectionChanged(boolean isConnected) {
@@ -204,7 +189,6 @@ public abstract class BaseMoviesFragment extends Fragment
         return layoutManager;
     }
 
-    protected abstract void resetMovies();
     protected abstract void movieInteraction(Movie movie);
-    protected abstract void loadMoreMoviesInPage(int page);
+    protected abstract void refreshMovies();
 }

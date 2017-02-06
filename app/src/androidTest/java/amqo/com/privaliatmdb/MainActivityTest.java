@@ -30,8 +30,6 @@ import static android.support.test.espresso.contrib.RecyclerViewActions.scrollTo
 import static android.support.test.espresso.matcher.ViewMatchers.assertThat;
 import static android.support.test.espresso.matcher.ViewMatchers.hasDescendant;
 import static android.support.test.espresso.matcher.ViewMatchers.isAssignableFrom;
-import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static android.support.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static android.support.test.internal.util.Checks.checkNotNull;
@@ -70,9 +68,8 @@ public class MainActivityTest extends BaseActivityTest {
         recyclerView.perform(scrollToPosition(1));
         recyclerView.perform(actionOnItemAtPosition(1, click()));
 
-        String searchTitle = getResourceString(R.string.search_title);
         ViewInteraction actionMenuItemView = onView(
-                allOf(withId(R.id.action_search), withContentDescription(searchTitle), isDisplayed()));
+                allOf(withId(R.id.action_search)));
         actionMenuItemView.perform(click());
     }
 

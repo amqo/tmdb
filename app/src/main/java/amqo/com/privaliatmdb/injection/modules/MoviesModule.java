@@ -42,22 +42,22 @@ public class MoviesModule {
     }
 
     @Provides @PerFragment
-    MoviesScrollContract.View providesMoviesScrollView() {
+    MoviesScrollContract providesMoviesScrollView() {
         return mMoviesFragment;
     }
 
     @Provides @PerFragment
-    ConnectivityReceiverContract.View providesConnectivityView() {
+    ConnectivityReceiverContract.Listener providesConnectivityView() {
         return mMoviesFragment;
     }
 
     @Provides @PerFragment
-    MoviesFabUpContract.View providesMoviesFabUpView() {
+    MoviesFabUpContract.Presenter providesMoviesFabUpView() {
         return mMoviesFragment;
     }
 
     @Provides @PerFragment
-    MoviesContract.PresenterPopular providesMoviesPresenter(
+    MoviesContract.Presenter providesMoviesPresenter(
             MoviesEndpoint moviesEndpoint,
             SharedPreferences sharedPreferences,
             MoviesContract.View moviesView) {
@@ -66,9 +66,9 @@ public class MoviesModule {
     }
 
     @Provides @PerFragment
-    MoviesAdapterContract.View providesMoviesAdapterView(
+    MoviesAdapterContract providesMoviesAdapterView(
             MoviesContract.View moviesView,
-            MoviesContract.PresenterPopular presenter) {
+            MoviesContract.Presenter presenter) {
 
         return new MoviesRecyclerViewAdapter(moviesView, presenter);
     }

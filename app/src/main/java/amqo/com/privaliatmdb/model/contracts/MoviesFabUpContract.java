@@ -4,12 +4,12 @@ import android.support.design.widget.FloatingActionButton;
 
 public interface MoviesFabUpContract {
 
-    interface View {
+    interface Presenter {
 
         void scrollUp();
     }
 
-    interface Presenter {
+    interface View {
 
         boolean isUpFABVisible();
 

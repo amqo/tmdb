@@ -36,33 +36,33 @@ public class SearchMoviesModule {
     }
 
     @Provides @PerFragment
-    MoviesContract.ViewSearch providesMoviesView() {
+    MoviesContract.View providesMoviesView() {
         return mMoviesFragment;
     }
 
     @Provides @PerFragment
-    MoviesScrollContract.View providesMoviesScrollView() {
+    MoviesScrollContract providesMoviesScrollView() {
         return mMoviesFragment;
     }
 
     @Provides @PerFragment
-    ConnectivityReceiverContract.View providesConnectivityView() {
+    ConnectivityReceiverContract.Listener providesConnectivityView() {
         return mMoviesFragment;
     }
 
     @Provides @PerFragment
-    MoviesContract.PresenterSearch providesMoviesPresenter(
+    MoviesContract.Presenter providesMoviesPresenter(
             MoviesEndpoint moviesEndpoint,
             SharedPreferences sharedPreferences,
-            MoviesContract.ViewSearch moviesView) {
+            MoviesContract.View moviesView) {
 
         return new SearchMoviesPresenter(moviesEndpoint, moviesView, sharedPreferences);
     }
 
     @Provides @PerFragment
-    MoviesAdapterContract.View providesMoviesAdapterView(
-            MoviesContract.ViewSearch moviesView,
-            MoviesContract.PresenterSearch presenter) {
+    MoviesAdapterContract providesMoviesAdapterView(
+            MoviesContract.View moviesView,
+            MoviesContract.Presenter presenter) {
         return new MoviesRecyclerViewAdapter(moviesView, presenter);
     }
 }

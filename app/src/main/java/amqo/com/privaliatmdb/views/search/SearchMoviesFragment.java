@@ -19,17 +19,16 @@ import javax.inject.Inject;
 import amqo.com.privaliatmdb.MoviesApplication;
 import amqo.com.privaliatmdb.R;
 import amqo.com.privaliatmdb.model.Movie;
-import amqo.com.privaliatmdb.model.Movies;
 import amqo.com.privaliatmdb.model.contracts.MoviesContract;
+import amqo.com.privaliatmdb.model.contracts.MoviesContract.PresenterSearch;
 import amqo.com.privaliatmdb.views.BaseMoviesFragment;
 import amqo.com.privaliatmdb.views.BaseScrollListener;
 
 import static amqo.com.privaliatmdb.R.id.search;
 
-public class SearchMoviesFragment extends BaseMoviesFragment
-        implements MoviesContract.ViewSearch {
+public class SearchMoviesFragment extends BaseMoviesFragment {
 
-    @Inject MoviesContract.PresenterSearch mMoviesPresenter;
+    @Inject MoviesContract.Presenter mMoviesPresenter;
 
     // Here the injection is for the implementation of the Contracts
     // This is to make constructor injection work
@@ -64,21 +63,16 @@ public class SearchMoviesFragment extends BaseMoviesFragment
 
         MoviesApplication.getInstance().getSearchMoviesComponent().inject(this);
 
-        mBasePresenter = mMoviesPresenter;
-
         mRecyclerView.addOnScrollListener(mScrollListener);
 
-        boolean connected = mConnectivityNotifier.isConnected();
-        if(!TextUtils.isEmpty(mCurrentSearchTerm) && connected) {
-            mMoviesPresenter.searchMovies(1, mCurrentSearchTerm);
-        }
+        refreshMovies();
 
         return view;
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putString(CURRENT_SEARCH, mCurrentSearchTerm);
+        outState.putString(CURRENT_SEARCH, mSearchView.getQuery().toString());
         super.onSaveInstanceState(outState);
     }
 
@@ -100,6 +94,8 @@ public class SearchMoviesFragment extends BaseMoviesFragment
         mSearchView.setMaxWidth(Integer.MAX_VALUE);
         if(!TextUtils.isEmpty(mCurrentSearchTerm)) {
             mSearchView.setQuery(mCurrentSearchTerm, false);
+            ((PresenterSearch)mMoviesPresenter).setNewQuery(mCurrentSearchTerm);
+            refreshMovies();
         }
 
         mSearchView.setOnQueryTextListener(mSearchQueryListener);
@@ -120,29 +116,17 @@ public class SearchMoviesFragment extends BaseMoviesFragment
 
     // Parent abstract methods
 
-    protected void resetMovies() {
-        if (TextUtils.isEmpty(mCurrentSearchTerm)) {
-            mMoviesAdapter.refreshMovies(new Movies());
-            return;
-        }
-        setLoading(true);
-        mIsRefreshing = true;
-        mMoviesPresenter.searchMovies(1, mCurrentSearchTerm);
-    }
-
+    @Override
     protected void movieInteraction(Movie movie) {
         mSearchView.clearFocus();
     }
 
-    protected void loadMoreMoviesInPage(int page) {
-        mMoviesPresenter.searchMovies(page, mCurrentSearchTerm);
-    }
-
-    // MoviesContract.ViewSearch methods
-
     @Override
-    public void refreshMovies(String query) {
-        mCurrentSearchTerm = query;
-        super.refreshMovies();
+    protected void refreshMovies() {
+
+        boolean connected = mConnectivityNotifier.isConnected();
+        if(!TextUtils.isEmpty(mCurrentSearchTerm) && connected) {
+            mMoviesPresenter.refreshMovies();
+        }
     }
 }

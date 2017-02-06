@@ -10,7 +10,7 @@ import amqo.com.privaliatmdb.network.MoviesEndpoint;
 import amqo.com.privaliatmdb.views.BaseMoviesPresenter;
 import io.reactivex.Observable;
 
-public class MoviesPresenter extends BaseMoviesPresenter implements MoviesContract.PresenterPopular {
+public class MoviesPresenter extends BaseMoviesPresenter {
 
     public MoviesPresenter(
             MoviesEndpoint moviesEndpoint,
@@ -25,8 +25,14 @@ public class MoviesPresenter extends BaseMoviesPresenter implements MoviesContra
         initMoviesConfigurationConsumer();
     }
 
+    // MoviesContract.Presenter methods
+
     @Override
-    public void getMovies(int page) {
+    public void loadMoreMovies() {
+
+        if (isInLastPage()) return;
+
+        int page = getLastPageLoaded() + 1;
 
         mLoadingConfiguration = false;
 
@@ -34,16 +40,27 @@ public class MoviesPresenter extends BaseMoviesPresenter implements MoviesContra
 
         if (TextUtils.isEmpty(getMovieImagesBaseUrl())) return;
 
-        doSearch(page);
+        loadMoreMoviesInPage(page);
     }
 
-    private void doSearch(int page) {
+    @Override
+    public void refreshMovies() {
+
+        mLoadingConfiguration = false;
+
+        mMoviesView.setLoading(true);
+
+        if (TextUtils.isEmpty(getMovieImagesBaseUrl())) return;
+
+        loadMoreMoviesInPage(1);
+    }
+
+    private void loadMoreMoviesInPage(int page) {
 
         Observable<Movies> moviesObservable = mMoviesEndpoint.getMovies(
                 MoviesEndpoint.API_VERSION,
                 MovieParameterCreator.createPopularMoviesParameters(page));
 
-        doSearch(moviesObservable);
+        doSubscribe(moviesObservable);
     }
-
 }

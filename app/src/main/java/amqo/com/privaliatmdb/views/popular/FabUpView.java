@@ -7,15 +7,17 @@ import javax.inject.Inject;
 
 import amqo.com.privaliatmdb.model.contracts.MoviesFabUpContract;
 
-public class FabUpPresenter implements MoviesFabUpContract.Presenter {
+public class FabUpView implements MoviesFabUpContract.View {
 
     private FloatingActionButton mUpFAB;
-    private MoviesFabUpContract.View mFabUpView;
+    private MoviesFabUpContract.Presenter mFabUpPresenter;
 
     @Inject
-    public FabUpPresenter(MoviesFabUpContract.View fabUpView) {
-        mFabUpView = fabUpView;
+    public FabUpView(MoviesFabUpContract.Presenter fabUpPresenter) {
+        mFabUpPresenter = fabUpPresenter;
     }
+
+    //  MoviesFabUpContract.View methods
 
     @Override
     public boolean isUpFABVisible() {
@@ -40,7 +42,7 @@ public class FabUpPresenter implements MoviesFabUpContract.Presenter {
             @Override
             public void onClick(View view) {
                 mUpFAB.hide();
-                mFabUpView.scrollUp();
+                mFabUpPresenter.scrollUp();
             }
         });
     }

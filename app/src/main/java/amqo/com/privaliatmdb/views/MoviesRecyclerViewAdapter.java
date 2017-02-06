@@ -30,7 +30,7 @@ import amqo.com.privaliatmdb.views.viewHolders.MovieItemViewHolder;
 
 public class MoviesRecyclerViewAdapter
         extends RecyclerView.Adapter<MovieItemViewHolder>
-        implements MoviesAdapterContract.View {
+        implements MoviesAdapterContract {
 
     private final List<Movie> mValues;
     private final MoviesContract.View mMoviesView;

@@ -9,43 +9,51 @@ import javax.inject.Inject;
 
 import amqo.com.privaliatmdb.MoviesApplication;
 import amqo.com.privaliatmdb.R;
+import amqo.com.privaliatmdb.model.contracts.MoviesContract;
 import amqo.com.privaliatmdb.model.contracts.MoviesScrollContract;
 
 public class BaseScrollListener extends RecyclerView.OnScrollListener {
 
-    protected final MoviesScrollContract.View mMoviesScrollView;
+    protected final MoviesScrollContract mMoviesScroll;
+    protected final MoviesContract.Presenter mMoviesPresenter;
     protected final int THRESHOLD;
 
     @Inject
     public BaseScrollListener(
             MoviesApplication context,
-            MoviesScrollContract.View moviesScrollView) {
+            MoviesScrollContract moviesScroll,
+            MoviesContract.Presenter moviesPresenter) {
 
         THRESHOLD = context.getResources().getInteger(R.integer.grid_columns) * 2;
 
-        mMoviesScrollView = moviesScrollView;
+        mMoviesScroll = moviesScroll;
+        mMoviesPresenter = moviesPresenter;
     }
 
     @Override
     public void onScrolled(RecyclerView recyclerView, int dx, final int dy) {
         super.onScrolled(recyclerView, dx, dy);
 
-        if (mMoviesScrollView.isLoading() || mMoviesScrollView.isInLastPage())
+        if (mMoviesScroll.isLoading())
             return;
 
-        RecyclerView.LayoutManager layoutManager = mMoviesScrollView.getLayoutManager();
+        RecyclerView.LayoutManager layoutManager = mMoviesScroll.getLayoutManager();
         int visibleItemCount = layoutManager.getChildCount();
         int totalItemCount = layoutManager.getItemCount();
 
-        int pastVisibleItems = getPastVisibleItems();
+        int pastVisibleItems = getPastVisibleItems(layoutManager);
 
         if (pastVisibleItems + visibleItemCount >= totalItemCount - THRESHOLD) {
-            mMoviesScrollView.loadMoreMovies();
+            mMoviesPresenter.loadMoreMovies();
         }
     }
 
     protected int getPastVisibleItems() {
-        RecyclerView.LayoutManager layoutManager = mMoviesScrollView.getLayoutManager();
+        RecyclerView.LayoutManager layoutManager = mMoviesScroll.getLayoutManager();
+        return getPastVisibleItems(layoutManager);
+    }
+
+    private int getPastVisibleItems(RecyclerView.LayoutManager layoutManager) {
 
         int pastVisibleItems = 0;
 

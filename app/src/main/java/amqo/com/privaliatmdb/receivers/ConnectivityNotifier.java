@@ -11,16 +11,16 @@ import amqo.com.privaliatmdb.model.contracts.ConnectivityReceiverContract;
 
 public class ConnectivityNotifier {
 
-    private ConnectivityReceiverContract.View connectivityView;
+    private ConnectivityReceiverContract.Listener connectivityListener;
 
     private static boolean isConnected = false;
 
     private static boolean needConnectivityInit = true;
 
     @Inject
-    public ConnectivityNotifier(ConnectivityReceiverContract.View connectivityView) {
+    public ConnectivityNotifier(ConnectivityReceiverContract.Listener connectivityListener) {
         needConnectivityInit = true;
-        this.connectivityView = connectivityView;
+        this.connectivityListener = connectivityListener;
         notifyConnectivityView(true);
     }
 
@@ -47,8 +47,8 @@ public class ConnectivityNotifier {
 
         if (firstNotify && isConnected) return;
 
-        if (connectivityView != null) {
-            connectivityView.onNetworkConnectionChanged(isConnected);
+        if (connectivityListener != null) {
+            connectivityListener.onNetworkConnectionChanged(isConnected);
         }
     }
 }
