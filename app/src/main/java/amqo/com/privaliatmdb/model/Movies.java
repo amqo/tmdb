@@ -10,9 +10,6 @@ public class Movies {
     @SerializedName("page")
     private int mPage;
 
-    @SerializedName("total_results")
-    private int mTotalResults;
-
     @SerializedName("total_pages")
     private int mTotalPages;
 
@@ -21,10 +18,6 @@ public class Movies {
 
     public int getPage() {
         return mPage;
-    }
-
-    public int getTotalResults() {
-        return mTotalResults;
     }
 
     public int getTotalPages() {

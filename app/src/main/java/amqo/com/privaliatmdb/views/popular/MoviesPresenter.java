@@ -11,7 +11,6 @@ import amqo.com.privaliatmdb.views.BaseMoviesPresenter;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Action;
-import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
 public class MoviesPresenter extends BaseMoviesPresenter implements MoviesContract.PresenterPopular {
@@ -38,20 +37,11 @@ public class MoviesPresenter extends BaseMoviesPresenter implements MoviesContra
 
         if (TextUtils.isEmpty(getMovieImagesBaseUrl())) return;
 
-        getMoviesFromPage(page, mMoviesConsumer);
+        doSearch(page);
     }
 
-    @Override
-    public String getMovieImagesBaseUrl() {
-        return super.getMovieImagesBaseUrl();
-    }
+    private void doSearch(int page) {
 
-    @Override
-    public void updateMoviesConfiguration() {
-        super.updateMoviesConfiguration();
-    }
-
-    private void getMoviesFromPage(int page, Consumer<Movies> consumer) {
         Observable<Movies> moviesObservable = mMoviesEndpoint.getMovies(
                 MoviesEndpoint.API_VERSION,
                 MovieParameterCreator.createPopularMoviesParameters(page));
@@ -66,7 +56,7 @@ public class MoviesPresenter extends BaseMoviesPresenter implements MoviesContra
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .onErrorReturnItem(new Movies())
-                .subscribe(consumer);
+                .subscribe(mMoviesConsumer);
     }
 
 }

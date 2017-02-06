@@ -13,7 +13,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
-public abstract class BaseMoviesPresenter {
+public abstract class BaseMoviesPresenter implements MoviesContract.Presenter {
 
     protected MoviesEndpoint mMoviesEndpoint;
     protected MoviesContract.View mMoviesView;
@@ -27,7 +27,8 @@ public abstract class BaseMoviesPresenter {
     protected boolean mLoadingConfiguration = false;
     protected boolean mConfigurationLoaded = false;
 
-    protected String getMovieImagesBaseUrl() {
+    @Override
+    public String getMovieImagesBaseUrl() {
 
         if (!TextUtils.isEmpty(mImageBaseUrl))
             return mImageBaseUrl;
@@ -42,7 +43,8 @@ public abstract class BaseMoviesPresenter {
         return mImageBaseUrl;
     }
 
-    protected void updateMoviesConfiguration() {
+    @Override
+    public void updateMoviesConfiguration() {
 
         if (mLoadingConfiguration || mConfigurationLoaded) return;
         mLoadingConfiguration = true;
