@@ -15,6 +15,8 @@ import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static android.support.test.espresso.action.ViewActions.replaceText;
+import static android.support.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition;
+import static android.support.test.espresso.contrib.RecyclerViewActions.scrollToPosition;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withParent;
@@ -31,16 +33,30 @@ public class SearchActivityTest extends BaseActivityTest {
     }
 
     @Test
-    public void searchActivityTest() {
+    public void searchActivityTest() throws InterruptedException {
 
+        // Check fab button to start search, toolbar not collapsed
         onView(withId(R.id.fab)).perform(click());
 
+        // Check search query
         ViewInteraction searchAutoComplete = onView(
                 allOf(withId(R.id.search_src_text),
                         withParent(allOf(withId(R.id.search_plate),
                                 withParent(withId(R.id.search_edit_frame)))),
                         isDisplayed()));
         searchAutoComplete.perform(replaceText(DEFAULT_SEARCH), closeSoftKeyboard());
+
+        Thread.sleep(2 * 1000);
+
+        ViewInteraction recyclerView = onView(withId(R.id.list));
+
+        // Check first element rank
+        recyclerView.check(new MainActivityTest.RecyclerViewRankAssertion("1"));
+
+        // Check second element rank
+        recyclerView.perform(scrollToPosition(1));
+        recyclerView.perform(actionOnItemAtPosition(1, click()));
+        recyclerView.check(new MainActivityTest.RecyclerViewRankAssertion("2"));
 
         clickOnRemoveQueryButton();
 

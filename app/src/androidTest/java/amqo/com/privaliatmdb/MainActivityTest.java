@@ -8,15 +8,9 @@ import android.support.test.espresso.ViewAction;
 import android.support.test.espresso.ViewAssertion;
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.runner.AndroidJUnit4;
-import android.support.test.uiautomator.By;
-import android.support.test.uiautomator.UiObject;
-import android.support.test.uiautomator.UiObjectNotFoundException;
-import android.support.test.uiautomator.UiSelector;
-import android.support.test.uiautomator.Until;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.TextView;
 
 import org.hamcrest.Matcher;
 import org.junit.Before;
@@ -31,7 +25,10 @@ import static android.support.test.espresso.contrib.RecyclerViewActions.actionOn
 import static android.support.test.espresso.contrib.RecyclerViewActions.scrollToPosition;
 import static android.support.test.espresso.matcher.ViewMatchers.assertThat;
 import static android.support.test.espresso.matcher.ViewMatchers.isAssignableFrom;
+import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 
 @RunWith(AndroidJUnit4.class)
@@ -53,56 +50,31 @@ public class MainActivityTest extends BaseActivityTest {
     }
 
     @Test
-    public void mainActivity_RecyclerSize() {
+    public void mainActivity_checkRecyclerView() throws InterruptedException {
 
-        onView(withId(R.id.list)).check(new RecyclerViewItemCountAssertion(20));
-    }
-
-    @Test
-    public void mainActivity_collapseAndClickSearch() {
-
+        // Check collapse
         onView(withId(R.id.app_bar)).perform(collapseAppBarLayout());
 
-        ViewInteraction recyclerView = onView(withId(R.id.list));
-
-        recyclerView.perform(scrollToPosition(1));
-        recyclerView.perform(actionOnItemAtPosition(1, click()));
-
-        clickOnSearch();
-    }
-
-    @Test
-    public void mainActivity_rankText() {
-
-        waitForRecyclerView();
+        Thread.sleep(2 * 1000);
 
         ViewInteraction recyclerView = onView(withId(R.id.list));
 
+        // Check initial load size
+        recyclerView.check(new RecyclerViewItemCountAssertion(20));
+
+        // Check first element rank
         recyclerView.check(new RecyclerViewRankAssertion("1"));
 
+        // Check second element rank
         recyclerView.perform(scrollToPosition(1));
         recyclerView.perform(actionOnItemAtPosition(1, click()));
         recyclerView.check(new RecyclerViewRankAssertion("2"));
-    }
 
-    private void waitForRecyclerView() {
-
-        mDevice.wait(Until.hasObject(By.res("amqo.com.privaliatmdb",
-                "amqo.com.privaliatmdb:id/list")), 2000);
-        mDevice.findObject(new UiSelector().resourceId("amqo.com.privaliatmdb:id/list"));
-    }
-
-    private void clickOnSearch() {
-
-        mDevice.wait(Until.hasObject(By.res("amqo.com.privaliatmdb",
-                "amqo.com.privaliatmdb:id/action_search")), 2000);
-        UiObject searchItem = mDevice.findObject(
-                new UiSelector().resourceId("amqo.com.privaliatmdb:id/action_search"));
-        try {
-            searchItem.click();
-        } catch (UiObjectNotFoundException e) {
-            // button not found
-        }
+        // Check collapsed toolbar search available
+        String searchTitle = getResourceString(R.string.search_title);
+        ViewInteraction actionMenuItemView = onView(
+                allOf(withId(R.id.action_search), withContentDescription(searchTitle), isDisplayed()));
+        actionMenuItemView.perform(click());
     }
 
 
@@ -145,26 +117,6 @@ public class MainActivityTest extends BaseActivityTest {
             RecyclerView recyclerView = (RecyclerView) view;
             RecyclerView.Adapter adapter = recyclerView.getAdapter();
             assertThat(adapter.getItemCount(), is(expectedCount));
-        }
-    }
-
-    public class RecyclerViewRankAssertion implements ViewAssertion {
-        private final String expectedRank;
-
-        public RecyclerViewRankAssertion(String expectedRank) {
-            this.expectedRank = expectedRank;
-        }
-
-        @Override
-        public void check(View view, NoMatchingViewException noViewFoundException) {
-            if (noViewFoundException != null) {
-                throw noViewFoundException;
-            }
-
-            RecyclerView recyclerView = (RecyclerView) view;
-            View viewHolder = recyclerView.getLayoutManager().getChildAt(0);
-            TextView rankText = (TextView) viewHolder.findViewById(R.id.title_rank);
-            assertThat(rankText.getText().toString(), is(expectedRank));
         }
     }
 }

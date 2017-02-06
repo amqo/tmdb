@@ -4,8 +4,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.espresso.NoMatchingViewException;
+import android.support.test.espresso.ViewAssertion;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.uiautomator.UiDevice;
+import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.widget.TextView;
 
 import org.junit.Rule;
 
@@ -13,6 +18,9 @@ import amqo.com.privaliatmdb.injection.ApplicationComponent;
 import amqo.com.privaliatmdb.injection.DaggerApplicationComponent;
 import amqo.com.privaliatmdb.injection.modules.ApplicationModule;
 import amqo.com.privaliatmdb.views.popular.MainActivity;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 public class BaseActivityTest {
 
@@ -43,5 +51,25 @@ public class BaseActivityTest {
     protected String getResourceString(int id) {
         Context targetContext = InstrumentationRegistry.getTargetContext();
         return targetContext.getResources().getString(id);
+    }
+
+    protected class RecyclerViewRankAssertion implements ViewAssertion {
+        private final String expectedRank;
+
+        public RecyclerViewRankAssertion(String expectedRank) {
+            this.expectedRank = expectedRank;
+        }
+
+        @Override
+        public void check(View view, NoMatchingViewException noViewFoundException) {
+            if (noViewFoundException != null) {
+                throw noViewFoundException;
+            }
+
+            RecyclerView recyclerView = (RecyclerView) view;
+            View viewHolder = recyclerView.getLayoutManager().getChildAt(0);
+            TextView rankText = (TextView) viewHolder.findViewById(R.id.title_rank);
+            assertThat(rankText.getText().toString(), is(expectedRank));
+        }
     }
 }
