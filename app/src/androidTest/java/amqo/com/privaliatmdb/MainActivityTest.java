@@ -41,6 +41,7 @@ public class MainActivityTest extends BaseActivityTest {
 
     @Test
     public void sharedPreferencesTest() {
+
         String baseImageUrl = mSharedPreferences.getString(MoviesEndpoint.BASE_IMAGE_API_KEY, "");
         assertThat(TextUtils.isEmpty(baseImageUrl), is(false));
 
@@ -74,10 +75,10 @@ public class MainActivityTest extends BaseActivityTest {
         ViewInteraction actionMenuItemView = onView(
                 allOf(withId(R.id.action_search), withContentDescription(searchTitle), isDisplayed()));
         actionMenuItemView.perform(click());
-
     }
 
     private ViewAction collapseAppBarLayout() {
+
         return new ViewAction() {
             @Override
             public Matcher<View> getConstraints() {
@@ -99,6 +100,7 @@ public class MainActivityTest extends BaseActivityTest {
     }
 
     private class RecyclerViewItemCountAssertion implements ViewAssertion {
+
         private final int expectedCount;
 
         public RecyclerViewItemCountAssertion(int expectedCount) {

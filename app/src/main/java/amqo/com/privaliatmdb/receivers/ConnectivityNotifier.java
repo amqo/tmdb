@@ -7,20 +7,21 @@ import android.net.NetworkInfo;
 import javax.inject.Inject;
 
 import amqo.com.privaliatmdb.MoviesApplication;
-import amqo.com.privaliatmdb.model.contracts.ConnectivityReceiverContract;
+import amqo.com.privaliatmdb.model.contracts.MoviesContract;
 
 public class ConnectivityNotifier {
 
-    private ConnectivityReceiverContract.View connectivityView;
+    private MoviesContract.Presenter mMoviesPresenter;
 
     private static boolean isConnected = false;
 
     private static boolean needConnectivityInit = true;
 
     @Inject
-    public ConnectivityNotifier(ConnectivityReceiverContract.View connectivityView) {
+    public ConnectivityNotifier(MoviesContract.Presenter moviesPresenter) {
+
         needConnectivityInit = true;
-        this.connectivityView = connectivityView;
+        this.mMoviesPresenter = moviesPresenter;
         notifyConnectivityView(true);
     }
 
@@ -42,13 +43,14 @@ public class ConnectivityNotifier {
     }
 
     public void notifyConnectivityView(boolean firstNotify) {
+
         needConnectivityInit = true;
         boolean isConnected = isConnected();
 
         if (firstNotify && isConnected) return;
 
-        if (connectivityView != null) {
-            connectivityView.onNetworkConnectionChanged(isConnected);
+        if (mMoviesPresenter != null) {
+            mMoviesPresenter.onNetworkConnectionChanged(isConnected);
         }
     }
 }

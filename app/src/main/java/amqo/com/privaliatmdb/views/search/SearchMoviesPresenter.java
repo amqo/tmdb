@@ -11,11 +11,13 @@ import amqo.com.privaliatmdb.views.BaseMoviesPresenter;
 import io.reactivex.Observable;
 
 public class SearchMoviesPresenter extends BaseMoviesPresenter
-        implements MoviesContract.PresenterSearch {
+    implements MoviesContract.PresenterSearch {
+
+    private String mCurrentQuery = "";
 
     public SearchMoviesPresenter(
             MoviesEndpoint moviesEndpoint,
-            MoviesContract.ViewSearch moviesView,
+            MoviesContract.View moviesView,
             SharedPreferences sharedPreferences) {
 
         mMoviesEndpoint = moviesEndpoint;
@@ -26,10 +28,17 @@ public class SearchMoviesPresenter extends BaseMoviesPresenter
         initMoviesConfigurationConsumer();
     }
 
-    @Override
-    public void searchMovies(int page, String query) {
+    // MoviesContract.Presenter methods
 
-        if (TextUtils.isEmpty(query)) return;
+    @Override
+    public void loadMoreMovies() {
+
+        if (isInLastPage()) return;
+
+        if (TextUtils.isEmpty(mCurrentQuery)) {
+            mMoviesView.clearMovies();
+            return;
+        }
 
         mLoadingConfiguration = false;
 
@@ -37,15 +46,42 @@ public class SearchMoviesPresenter extends BaseMoviesPresenter
 
         if (TextUtils.isEmpty(getMovieImagesBaseUrl())) return;
 
-        doSearch(page, query);
+        int page = getLastPageLoaded() + 1;
+
+        searchMoviesInPage(page);
     }
 
-    private void doSearch(int page, String query) {
+    @Override
+    public void refreshMovies() {
+
+        mMoviesView.clearMovies();
+
+        if (TextUtils.isEmpty(mCurrentQuery)) {
+            return;
+        }
+
+        mLoadingConfiguration = false;
+
+        mMoviesView.setLoading(true);
+
+        if (TextUtils.isEmpty(getMovieImagesBaseUrl())) return;
+
+        searchMoviesInPage(1);
+    }
+
+    // MoviesContract.PresenterSearch methods
+
+    @Override
+    public void setNewQuery(String query) {
+        mCurrentQuery = query;
+    }
+
+    private void searchMoviesInPage(int page) {
 
         Observable<Movies> moviesObservable = mMoviesEndpoint.searchMovies(
                 MoviesEndpoint.API_VERSION,
-                MovieParameterCreator.createSearchParameters(page, query));
+                MovieParameterCreator.createSearchParameters(page, mCurrentQuery));
 
-        doSearch(moviesObservable);
+        doSubscribe(moviesObservable);
     }
 }

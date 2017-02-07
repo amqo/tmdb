@@ -6,8 +6,8 @@ import android.support.v7.widget.RecyclerView;
 import javax.inject.Inject;
 
 import amqo.com.privaliatmdb.MoviesApplication;
-import amqo.com.privaliatmdb.model.contracts.MoviesFabUpContract;
-import amqo.com.privaliatmdb.model.contracts.MoviesScrollContract;
+import amqo.com.privaliatmdb.model.contracts.MoviesContract;
+import amqo.com.privaliatmdb.model.contracts.MoviesFabUp;
 import amqo.com.privaliatmdb.views.BaseScrollListener;
 
 public class MoviesScrollListener extends BaseScrollListener {
@@ -19,14 +19,15 @@ public class MoviesScrollListener extends BaseScrollListener {
 
     private boolean mScrollingUp = false;
 
-    private MoviesFabUpContract.Presenter mMoviesFabUpPrsenter;
+    private MoviesFabUp mMoviesFabUpView;
 
     @Inject
     public MoviesScrollListener(
             MoviesApplication context,
-            MoviesScrollContract.View moviesScrollView) {
+            MoviesContract.View moviesView,
+            MoviesContract.Presenter moviesPresenter) {
 
-        super(context, moviesScrollView);
+        super(context, moviesView, moviesPresenter);
     }
 
     @Override
@@ -34,18 +35,18 @@ public class MoviesScrollListener extends BaseScrollListener {
 
         super.onScrolled(recyclerView, dx, dy);
 
-        if (mMoviesScrollView.isLoading())
+        if (mMoviesView.isLoading())
             return;
 
         int pastVisibleItems = getPastVisibleItems();
         if (pastVisibleItems <= THRESHOLD) {
             mShowFabHandler.removeCallbacks(mShowFabRunnable);
-            mMoviesFabUpPrsenter.setShownUpFAB(false);
+            mMoviesFabUpView.setShownUpFAB(false);
         } else manageFABVisibility(dy, getPastVisibleItems());
     }
 
-    public void setPresenter(MoviesFabUpContract.Presenter moviesFabUpPresenter) {
-        mMoviesFabUpPrsenter = moviesFabUpPresenter;
+    public void setFabUpView(MoviesFabUp moviesFabUpView) {
+        mMoviesFabUpView = moviesFabUpView;
     }
 
     private void manageFABVisibility(int dy, final int pastItems) {
@@ -62,8 +63,8 @@ public class MoviesScrollListener extends BaseScrollListener {
         // If FAB is visible and is scrolling down,
         // or reach a top item position, make FAB gone automatically
         if ((!mScrollingUp || pastItems < THRESHOLD + 1) &&
-                mMoviesFabUpPrsenter.isUpFABVisible()) {
-            mMoviesFabUpPrsenter.setShownUpFAB(false);
+                mMoviesFabUpView.isUpFABVisible()) {
+            mMoviesFabUpView.setShownUpFAB(false);
         }
 
         // If no change in scroll direction, keep FAB visibility
@@ -74,8 +75,8 @@ public class MoviesScrollListener extends BaseScrollListener {
             public void run() {
                 // If scrolling up and FAB is not already visible, and not in top item position,
                 // then make FAB visible, unless a change in scroll direction occurs before timer delay
-                if (mScrollingUp && !mMoviesFabUpPrsenter.isUpFABVisible() && pastItems > THRESHOLD) {
-                    mMoviesFabUpPrsenter.setShownUpFAB(true);
+                if (mScrollingUp && !mMoviesFabUpView.isUpFABVisible() && pastItems > THRESHOLD) {
+                    mMoviesFabUpView.setShownUpFAB(true);
                 }
             }
         };

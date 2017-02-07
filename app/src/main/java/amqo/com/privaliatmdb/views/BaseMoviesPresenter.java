@@ -1,6 +1,8 @@
 package amqo.com.privaliatmdb.views;
 
 import android.content.SharedPreferences;
+import android.support.annotation.VisibleForTesting;
+import android.support.design.widget.Snackbar;
 import android.text.TextUtils;
 
 import amqo.com.privaliatmdb.model.Movies;
@@ -8,13 +10,15 @@ import amqo.com.privaliatmdb.model.MoviesConfiguration;
 import amqo.com.privaliatmdb.model.contracts.MoviesContract;
 import amqo.com.privaliatmdb.network.MovieParameterCreator;
 import amqo.com.privaliatmdb.network.MoviesEndpoint;
+import amqo.com.privaliatmdb.views.utils.NotificationsHelper;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
-public abstract class BaseMoviesPresenter implements MoviesContract.Presenter {
+public abstract class BaseMoviesPresenter
+        implements MoviesContract.Presenter {
 
     protected MoviesEndpoint mMoviesEndpoint;
     protected MoviesContract.View mMoviesView;
@@ -29,6 +33,9 @@ public abstract class BaseMoviesPresenter implements MoviesContract.Presenter {
 
     protected boolean mLoadingConfiguration = false;
     protected boolean mConfigurationLoaded = false;
+
+    protected boolean mNeedRefresh = false;
+    protected Snackbar mConnectivitySnackbar;
 
     // MoviesContract.Presenter methods
 
@@ -67,11 +74,35 @@ public abstract class BaseMoviesPresenter implements MoviesContract.Presenter {
     }
 
     @Override
-    public int getLastPageLoaded() {
-        return mLastReceivedMovies.getPage();
+    public void scrollUp() {
+        mMoviesView.getRecyclerView().scrollToPosition(0);
     }
 
     @Override
+    public void onNetworkConnectionChanged(boolean isConnected) {
+        if (!isConnected) {
+            mNeedRefresh = true;
+            mConnectivitySnackbar = NotificationsHelper
+                    .showSnackConnectivity(mMoviesView);
+        } else {
+            if (mConnectivitySnackbar != null) {
+                mConnectivitySnackbar.dismiss();
+                mConnectivitySnackbar = null;
+            }
+            if (mNeedRefresh) {
+                mNeedRefresh = false;
+                refreshMovies();
+            }
+        }
+    }
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
+    public int getLastPageLoaded() {
+        if (mLastReceivedMovies == null) return 0;
+        return mLastReceivedMovies.getPage();
+    }
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     public boolean isInLastPage() {
         if (mLastReceivedMovies == null) return true;
         return mLastReceivedMovies.getTotalPages() == mLastReceivedMovies.getPage();
@@ -109,12 +140,12 @@ public abstract class BaseMoviesPresenter implements MoviesContract.Presenter {
                 // This is to avoid repeated configuration loads when the error was not due to this
                 mConfigurationLoaded = true;
 
-                mMoviesView.refreshMovies();
+                refreshMovies();
             }
         };
     }
 
-    protected void doSearch(Observable<Movies> moviesObservable) {
+    protected void doSubscribe(Observable<Movies> moviesObservable) {
 
         moviesObservable
                 .doOnComplete(new Action() {

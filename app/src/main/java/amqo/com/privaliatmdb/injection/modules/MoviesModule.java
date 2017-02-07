@@ -4,11 +4,8 @@ import android.app.Activity;
 import android.content.SharedPreferences;
 
 import amqo.com.privaliatmdb.injection.scopes.PerFragment;
-import amqo.com.privaliatmdb.model.contracts.ConnectivityReceiverContract;
-import amqo.com.privaliatmdb.model.contracts.MoviesAdapterContract;
+import amqo.com.privaliatmdb.model.contracts.MoviesAdapter;
 import amqo.com.privaliatmdb.model.contracts.MoviesContract;
-import amqo.com.privaliatmdb.model.contracts.MoviesFabUpContract;
-import amqo.com.privaliatmdb.model.contracts.MoviesScrollContract;
 import amqo.com.privaliatmdb.network.MoviesEndpoint;
 import amqo.com.privaliatmdb.views.MoviesRecyclerViewAdapter;
 import amqo.com.privaliatmdb.views.popular.MoviesFragment;
@@ -42,22 +39,7 @@ public class MoviesModule {
     }
 
     @Provides @PerFragment
-    MoviesScrollContract.View providesMoviesScrollView() {
-        return mMoviesFragment;
-    }
-
-    @Provides @PerFragment
-    ConnectivityReceiverContract.View providesConnectivityView() {
-        return mMoviesFragment;
-    }
-
-    @Provides @PerFragment
-    MoviesFabUpContract.View providesMoviesFabUpView() {
-        return mMoviesFragment;
-    }
-
-    @Provides @PerFragment
-    MoviesContract.PresenterPopular providesMoviesPresenter(
+    MoviesContract.Presenter providesMoviesPresenter(
             MoviesEndpoint moviesEndpoint,
             SharedPreferences sharedPreferences,
             MoviesContract.View moviesView) {
@@ -66,9 +48,9 @@ public class MoviesModule {
     }
 
     @Provides @PerFragment
-    MoviesAdapterContract.View providesMoviesAdapterView(
+    MoviesAdapter providesMoviesAdapterView(
             MoviesContract.View moviesView,
-            MoviesContract.PresenterPopular presenter) {
+            MoviesContract.Presenter presenter) {
 
         return new MoviesRecyclerViewAdapter(moviesView, presenter);
     }

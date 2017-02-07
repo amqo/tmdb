@@ -1,27 +1,33 @@
 package amqo.com.privaliatmdb.model.contracts;
 
+import android.support.v7.widget.RecyclerView;
+
 import amqo.com.privaliatmdb.model.Movie;
 import amqo.com.privaliatmdb.model.Movies;
 import amqo.com.privaliatmdb.model.MoviesConfiguration;
+import amqo.com.privaliatmdb.model.MoviesContext;
 
 public interface MoviesContract {
 
     interface View {
 
-        void refreshMovies();
-
         void setLoading(boolean loading);
+
+        boolean isLoading();
+
+        RecyclerView.LayoutManager getLayoutManager();
 
         String getCorrectImageSize(MoviesConfiguration moviesConfiguration);
 
         void onMovieInteraction(Movie movie);
 
         void onMoviesLoaded(Movies movies);
-    }
 
-    interface ViewSearch extends View {
+        RecyclerView getRecyclerView();
 
-        void refreshMovies(String query);
+        void clearMovies();
+
+        MoviesContext getMoviesContext();
     }
 
     interface Presenter {
@@ -30,18 +36,17 @@ public interface MoviesContract {
 
         void updateMoviesConfiguration();
 
-        int getLastPageLoaded();
+        void loadMoreMovies();
 
-        boolean isInLastPage();
+        void refreshMovies();
+
+        void scrollUp();
+
+        void onNetworkConnectionChanged(boolean isConnected);
     }
 
-    interface PresenterPopular extends  Presenter{
+    interface PresenterSearch extends Presenter {
 
-        void getMovies(int page);
-    }
-
-    interface PresenterSearch extends  Presenter {
-
-        void searchMovies(int page, String query);
+        void setNewQuery(String query);
     }
 }

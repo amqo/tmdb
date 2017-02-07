@@ -24,13 +24,13 @@ import amqo.com.privaliatmdb.MoviesApplication;
 import amqo.com.privaliatmdb.R;
 import amqo.com.privaliatmdb.model.Movie;
 import amqo.com.privaliatmdb.model.Movies;
-import amqo.com.privaliatmdb.model.contracts.MoviesAdapterContract;
+import amqo.com.privaliatmdb.model.contracts.MoviesAdapter;
 import amqo.com.privaliatmdb.model.contracts.MoviesContract;
 import amqo.com.privaliatmdb.views.viewHolders.MovieItemViewHolder;
 
 public class MoviesRecyclerViewAdapter
         extends RecyclerView.Adapter<MovieItemViewHolder>
-        implements MoviesAdapterContract.View {
+        implements MoviesAdapter {
 
     private final List<Movie> mValues;
     private final MoviesContract.View mMoviesView;
@@ -87,7 +87,7 @@ public class MoviesRecyclerViewAdapter
         return mValues.size();
     }
 
-    // MoviesAdapterContract.View methods
+    // MoviesAdapter.View methods
 
     @Override
     public void refreshMovies(Movies movies) {

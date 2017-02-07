@@ -21,7 +21,7 @@ public class ConnectivityReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
 
         BaseMoviesComponent baseMoviesComponent =
-                MoviesApplication.getInstance().getCurrentMoviesComponent();
+                MoviesApplication.getInstance().getActiveComponent();
 
         if (baseMoviesComponent != null) {
 
@@ -29,5 +29,4 @@ public class ConnectivityReceiver extends BroadcastReceiver {
             mConnectivityNotifier.notifyConnectivityView(false);
         }
     }
-
 }

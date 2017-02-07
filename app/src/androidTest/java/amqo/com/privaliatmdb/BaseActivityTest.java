@@ -19,7 +19,7 @@ import amqo.com.privaliatmdb.injection.DaggerApplicationComponent;
 import amqo.com.privaliatmdb.injection.modules.ApplicationModule;
 import amqo.com.privaliatmdb.views.popular.MainActivity;
 
-import static android.support.test.espresso.matcher.ViewMatchers.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 public class BaseActivityTest {

@@ -8,7 +8,6 @@ import dagger.Subcomponent;
 
 @PerFragment
 @Subcomponent( modules = { NetworkModule.class, SearchMoviesModule.class })
-public interface SearchMoviesComponent extends BaseMoviesComponent {
+public interface SearchMoviesComponent extends BaseMoviesComponent<SearchMoviesFragment> {
 
-    void inject(SearchMoviesFragment searchMoviesFragment);
 }
