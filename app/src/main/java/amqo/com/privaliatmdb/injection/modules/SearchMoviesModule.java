@@ -12,7 +12,6 @@ import amqo.com.privaliatmdb.views.search.SearchMoviesFragment;
 import amqo.com.privaliatmdb.views.search.SearchMoviesPresenter;
 import dagger.Module;
 import dagger.Provides;
-import retrofit2.Retrofit;
 
 @Module
 public class SearchMoviesModule {
@@ -26,11 +25,6 @@ public class SearchMoviesModule {
     @Provides @PerFragment
     Activity providesActivity() {
         return mMoviesFragment.getActivity();
-    }
-
-    @Provides @PerFragment
-    MoviesEndpoint providesMoviesEndpoint(Retrofit retrofit) {
-        return retrofit.create(MoviesEndpoint.class);
     }
 
     @Provides @PerFragment

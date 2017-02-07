@@ -42,4 +42,9 @@ public class NetworkModule {
 
         return retrofit;
     }
+
+    @Provides @PerFragment
+    MoviesEndpoint providesMoviesEndpoint(Retrofit retrofit) {
+        return retrofit.create(MoviesEndpoint.class);
+    }
 }

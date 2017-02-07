@@ -12,7 +12,6 @@ import amqo.com.privaliatmdb.views.popular.MoviesFragment;
 import amqo.com.privaliatmdb.views.popular.MoviesPresenter;
 import dagger.Module;
 import dagger.Provides;
-import retrofit2.Retrofit;
 
 @Module
 public class MoviesModule {
@@ -26,11 +25,6 @@ public class MoviesModule {
     @Provides @PerFragment
     Activity providesActivity() {
         return mMoviesFragment.getActivity();
-    }
-
-    @Provides @PerFragment
-    MoviesEndpoint providesMoviesEndpoint(Retrofit retrofit) {
-        return retrofit.create(MoviesEndpoint.class);
     }
 
     @Provides @PerFragment
