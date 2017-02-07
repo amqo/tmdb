@@ -7,8 +7,7 @@ import javax.inject.Inject;
 
 import amqo.com.privaliatmdb.MoviesApplication;
 import amqo.com.privaliatmdb.model.contracts.MoviesContract;
-import amqo.com.privaliatmdb.model.contracts.MoviesFabUpContract;
-import amqo.com.privaliatmdb.model.contracts.MoviesScrollContract;
+import amqo.com.privaliatmdb.model.contracts.MoviesFabUp;
 import amqo.com.privaliatmdb.views.BaseScrollListener;
 
 public class MoviesScrollListener extends BaseScrollListener {
@@ -20,15 +19,15 @@ public class MoviesScrollListener extends BaseScrollListener {
 
     private boolean mScrollingUp = false;
 
-    private MoviesFabUpContract.View mMoviesFabUpView;
+    private MoviesFabUp mMoviesFabUpView;
 
     @Inject
     public MoviesScrollListener(
             MoviesApplication context,
-            MoviesScrollContract moviesScroll,
+            MoviesContract.View moviesView,
             MoviesContract.Presenter moviesPresenter) {
 
-        super(context, moviesScroll, moviesPresenter);
+        super(context, moviesView, moviesPresenter);
     }
 
     @Override
@@ -36,7 +35,7 @@ public class MoviesScrollListener extends BaseScrollListener {
 
         super.onScrolled(recyclerView, dx, dy);
 
-        if (mMoviesScroll.isLoading())
+        if (mMoviesView.isLoading())
             return;
 
         int pastVisibleItems = getPastVisibleItems();
@@ -46,7 +45,7 @@ public class MoviesScrollListener extends BaseScrollListener {
         } else manageFABVisibility(dy, getPastVisibleItems());
     }
 
-    public void setFabUpView(MoviesFabUpContract.View moviesFabUpView) {
+    public void setFabUpView(MoviesFabUp moviesFabUpView) {
         mMoviesFabUpView = moviesFabUpView;
     }
 

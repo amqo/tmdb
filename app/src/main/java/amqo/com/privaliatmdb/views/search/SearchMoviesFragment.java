@@ -19,7 +19,6 @@ import javax.inject.Inject;
 import amqo.com.privaliatmdb.MoviesApplication;
 import amqo.com.privaliatmdb.R;
 import amqo.com.privaliatmdb.model.Movie;
-import amqo.com.privaliatmdb.model.contracts.MoviesContract;
 import amqo.com.privaliatmdb.model.contracts.MoviesContract.PresenterSearch;
 import amqo.com.privaliatmdb.views.BaseMoviesFragment;
 import amqo.com.privaliatmdb.views.BaseScrollListener;
@@ -27,8 +26,6 @@ import amqo.com.privaliatmdb.views.BaseScrollListener;
 import static amqo.com.privaliatmdb.R.id.search;
 
 public class SearchMoviesFragment extends BaseMoviesFragment {
-
-    @Inject MoviesContract.Presenter mMoviesPresenter;
 
     // Here the injection is for the implementation of the Contracts
     // This is to make constructor injection work
@@ -38,7 +35,7 @@ public class SearchMoviesFragment extends BaseMoviesFragment {
     private final String CURRENT_SEARCH = "CURRENT_SEARCH";
 
     private SearchView mSearchView;
-    private String mCurrentSearchTerm;
+    private String mSavedSearchTerm;
 
     public static SearchMoviesFragment newInstance() {
         return new SearchMoviesFragment();
@@ -50,7 +47,7 @@ public class SearchMoviesFragment extends BaseMoviesFragment {
         setHasOptionsMenu(true);
 
         if (savedInstanceState != null && savedInstanceState.containsKey(CURRENT_SEARCH)) {
-            mCurrentSearchTerm = savedInstanceState.getString(CURRENT_SEARCH);
+            mSavedSearchTerm = savedInstanceState.getString(CURRENT_SEARCH);
         }
     }
 
@@ -92,9 +89,9 @@ public class SearchMoviesFragment extends BaseMoviesFragment {
 
         searchItem.expandActionView();
         mSearchView.setMaxWidth(Integer.MAX_VALUE);
-        if(!TextUtils.isEmpty(mCurrentSearchTerm)) {
-            mSearchView.setQuery(mCurrentSearchTerm, false);
-            ((PresenterSearch)mMoviesPresenter).setNewQuery(mCurrentSearchTerm);
+        if(!TextUtils.isEmpty(mSavedSearchTerm)) {
+            mSearchView.setQuery(mSavedSearchTerm, false);
+            ((PresenterSearch)mMoviesPresenter).setNewQuery(mSavedSearchTerm);
             refreshMovies();
         }
 
@@ -118,14 +115,14 @@ public class SearchMoviesFragment extends BaseMoviesFragment {
 
     @Override
     protected void movieInteraction(Movie movie) {
+
         mSearchView.clearFocus();
     }
 
     @Override
     protected void refreshMovies() {
 
-        boolean connected = mConnectivityNotifier.isConnected();
-        if(!TextUtils.isEmpty(mCurrentSearchTerm) && connected) {
+        if(mConnectivityNotifier.isConnected()) {
             mMoviesPresenter.refreshMovies();
         }
     }

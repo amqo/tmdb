@@ -4,10 +4,8 @@ import android.app.Activity;
 import android.content.SharedPreferences;
 
 import amqo.com.privaliatmdb.injection.scopes.PerFragment;
-import amqo.com.privaliatmdb.model.contracts.ConnectivityReceiverContract;
-import amqo.com.privaliatmdb.model.contracts.MoviesAdapterContract;
+import amqo.com.privaliatmdb.model.contracts.MoviesAdapter;
 import amqo.com.privaliatmdb.model.contracts.MoviesContract;
-import amqo.com.privaliatmdb.model.contracts.MoviesScrollContract;
 import amqo.com.privaliatmdb.network.MoviesEndpoint;
 import amqo.com.privaliatmdb.views.MoviesRecyclerViewAdapter;
 import amqo.com.privaliatmdb.views.search.SearchMoviesFragment;
@@ -41,16 +39,6 @@ public class SearchMoviesModule {
     }
 
     @Provides @PerFragment
-    MoviesScrollContract providesMoviesScrollView() {
-        return mMoviesFragment;
-    }
-
-    @Provides @PerFragment
-    ConnectivityReceiverContract.Listener providesConnectivityView() {
-        return mMoviesFragment;
-    }
-
-    @Provides @PerFragment
     MoviesContract.Presenter providesMoviesPresenter(
             MoviesEndpoint moviesEndpoint,
             SharedPreferences sharedPreferences,
@@ -60,7 +48,7 @@ public class SearchMoviesModule {
     }
 
     @Provides @PerFragment
-    MoviesAdapterContract providesMoviesAdapterView(
+    MoviesAdapter providesMoviesAdapterView(
             MoviesContract.View moviesView,
             MoviesContract.Presenter presenter) {
         return new MoviesRecyclerViewAdapter(moviesView, presenter);

@@ -2,6 +2,7 @@ package amqo.com.privaliatmdb.views;
 
 import android.content.SharedPreferences;
 import android.support.annotation.VisibleForTesting;
+import android.support.design.widget.Snackbar;
 import android.text.TextUtils;
 
 import amqo.com.privaliatmdb.model.Movies;
@@ -9,6 +10,7 @@ import amqo.com.privaliatmdb.model.MoviesConfiguration;
 import amqo.com.privaliatmdb.model.contracts.MoviesContract;
 import amqo.com.privaliatmdb.network.MovieParameterCreator;
 import amqo.com.privaliatmdb.network.MoviesEndpoint;
+import amqo.com.privaliatmdb.views.utils.NotificationsHelper;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Action;
@@ -31,6 +33,9 @@ public abstract class BaseMoviesPresenter
 
     protected boolean mLoadingConfiguration = false;
     protected boolean mConfigurationLoaded = false;
+
+    protected boolean mNeedRefresh = false;
+    protected Snackbar mConnectivitySnackbar;
 
     // MoviesContract.Presenter methods
 
@@ -66,6 +71,29 @@ public abstract class BaseMoviesPresenter
                 .observeOn(AndroidSchedulers.mainThread())
                 .onErrorReturnItem(new MoviesConfiguration())
                 .subscribe(mMoviesConfigurationConsumer);
+    }
+
+    @Override
+    public void scrollUp() {
+        mMoviesView.getRecyclerView().scrollToPosition(0);
+    }
+
+    @Override
+    public void onNetworkConnectionChanged(boolean isConnected) {
+        if (!isConnected) {
+            mNeedRefresh = true;
+            mConnectivitySnackbar = NotificationsHelper
+                    .showSnackConnectivity(mMoviesView);
+        } else {
+            if (mConnectivitySnackbar != null) {
+                mConnectivitySnackbar.dismiss();
+                mConnectivitySnackbar = null;
+            }
+            if (mNeedRefresh) {
+                mNeedRefresh = false;
+                refreshMovies();
+            }
+        }
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)

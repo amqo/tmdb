@@ -2,7 +2,7 @@ package amqo.com.privaliatmdb.model.contracts;
 
 import amqo.com.privaliatmdb.model.Movies;
 
-public interface MoviesAdapterContract {
+public interface MoviesAdapter {
 
         void refreshMovies(Movies movies);
 

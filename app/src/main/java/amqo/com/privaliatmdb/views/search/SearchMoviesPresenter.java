@@ -54,8 +54,9 @@ public class SearchMoviesPresenter extends BaseMoviesPresenter
     @Override
     public void refreshMovies() {
 
+        mMoviesView.clearMovies();
+
         if (TextUtils.isEmpty(mCurrentQuery)) {
-            mMoviesView.clearMovies();
             return;
         }
 

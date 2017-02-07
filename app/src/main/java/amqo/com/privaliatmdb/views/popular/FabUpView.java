@@ -5,19 +5,20 @@ import android.view.View;
 
 import javax.inject.Inject;
 
-import amqo.com.privaliatmdb.model.contracts.MoviesFabUpContract;
+import amqo.com.privaliatmdb.model.contracts.MoviesContract;
+import amqo.com.privaliatmdb.model.contracts.MoviesFabUp;
 
-public class FabUpView implements MoviesFabUpContract.View {
+public class FabUpView implements MoviesFabUp {
 
     private FloatingActionButton mUpFAB;
-    private MoviesFabUpContract.Presenter mFabUpPresenter;
+    private MoviesContract.Presenter mMoviesPresenter;
 
     @Inject
-    public FabUpView(MoviesFabUpContract.Presenter fabUpPresenter) {
-        mFabUpPresenter = fabUpPresenter;
+    public FabUpView(MoviesContract.Presenter moviesPresenter) {
+        mMoviesPresenter = moviesPresenter;
     }
 
-    //  MoviesFabUpContract.View methods
+    //  MoviesFabUp.View methods
 
     @Override
     public boolean isUpFABVisible() {
@@ -42,7 +43,7 @@ public class FabUpView implements MoviesFabUpContract.View {
             @Override
             public void onClick(View view) {
                 mUpFAB.hide();
-                mFabUpPresenter.scrollUp();
+                mMoviesPresenter.scrollUp();
             }
         });
     }

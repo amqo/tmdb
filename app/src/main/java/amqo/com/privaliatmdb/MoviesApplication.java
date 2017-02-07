@@ -25,6 +25,8 @@ public class MoviesApplication extends Application {
     private MoviesComponent mMoviesComponent;
     private SearchMoviesComponent mSearchMoviesComponent;
 
+    private BaseMoviesComponent mActiveComponent;
+
     public static MoviesApplication getInstance() {
         return INSTANCE;
     }
@@ -45,6 +47,7 @@ public class MoviesApplication extends Application {
     public void createMoviesComponent(MoviesFragment fragment) {
         mMoviesComponent = mApplicationComponent.getMoviesComponent(
                 new MoviesModule(fragment));
+        mActiveComponent = mMoviesComponent;
     }
 
     public MoviesComponent getMoviesComponent() {
@@ -58,6 +61,7 @@ public class MoviesApplication extends Application {
     public void createSearchMoviesComponent(SearchMoviesFragment fragment) {
         mSearchMoviesComponent = mApplicationComponent.getSearchMoviesComponent(
                 new SearchMoviesModule(fragment));
+        mActiveComponent = mSearchMoviesComponent;
     }
 
     public SearchMoviesComponent getSearchMoviesComponent() {
@@ -68,8 +72,7 @@ public class MoviesApplication extends Application {
         mSearchMoviesComponent = null;
     }
 
-    public BaseMoviesComponent getCurrentMoviesComponent() {
-        if (mSearchMoviesComponent != null) return mSearchMoviesComponent;
-        else return mMoviesComponent;
+    public BaseMoviesComponent getActiveComponent() {
+        return mActiveComponent;
     }
 }

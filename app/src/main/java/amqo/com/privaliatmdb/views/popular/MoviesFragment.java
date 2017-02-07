@@ -11,14 +11,9 @@ import javax.inject.Inject;
 import amqo.com.privaliatmdb.MoviesApplication;
 import amqo.com.privaliatmdb.R;
 import amqo.com.privaliatmdb.model.Movie;
-import amqo.com.privaliatmdb.model.contracts.MoviesContract;
-import amqo.com.privaliatmdb.model.contracts.MoviesFabUpContract;
 import amqo.com.privaliatmdb.views.BaseMoviesFragment;
 
-public class MoviesFragment extends BaseMoviesFragment
-        implements MoviesFabUpContract.Presenter {
-
-    @Inject MoviesContract.Presenter mMoviesPresenter;
+public class MoviesFragment extends BaseMoviesFragment {
 
     // Here the injection is for the implementation of the Contracts
     // This is to make constructor injection work
@@ -67,13 +62,4 @@ public class MoviesFragment extends BaseMoviesFragment
             mMoviesPresenter.refreshMovies();
         }
     }
-
-    // MoviesFabUpContract.Presenter methods
-
-    @Override
-    public void scrollUp() {
-
-        mRecyclerView.scrollToPosition(0);
-    }
-
 }

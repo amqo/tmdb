@@ -10,23 +10,22 @@ import javax.inject.Inject;
 import amqo.com.privaliatmdb.MoviesApplication;
 import amqo.com.privaliatmdb.R;
 import amqo.com.privaliatmdb.model.contracts.MoviesContract;
-import amqo.com.privaliatmdb.model.contracts.MoviesScrollContract;
 
 public class BaseScrollListener extends RecyclerView.OnScrollListener {
 
-    protected final MoviesScrollContract mMoviesScroll;
+    protected final MoviesContract.View mMoviesView;
     protected final MoviesContract.Presenter mMoviesPresenter;
     protected final int THRESHOLD;
 
     @Inject
     public BaseScrollListener(
             MoviesApplication context,
-            MoviesScrollContract moviesScroll,
+            MoviesContract.View moviesView,
             MoviesContract.Presenter moviesPresenter) {
 
         THRESHOLD = context.getResources().getInteger(R.integer.grid_columns) * 2;
 
-        mMoviesScroll = moviesScroll;
+        mMoviesView = moviesView;
         mMoviesPresenter = moviesPresenter;
     }
 
@@ -34,10 +33,10 @@ public class BaseScrollListener extends RecyclerView.OnScrollListener {
     public void onScrolled(RecyclerView recyclerView, int dx, final int dy) {
         super.onScrolled(recyclerView, dx, dy);
 
-        if (mMoviesScroll.isLoading())
+        if (mMoviesView.isLoading())
             return;
 
-        RecyclerView.LayoutManager layoutManager = mMoviesScroll.getLayoutManager();
+        RecyclerView.LayoutManager layoutManager = mMoviesView.getLayoutManager();
         int visibleItemCount = layoutManager.getChildCount();
         int totalItemCount = layoutManager.getItemCount();
 
@@ -49,7 +48,7 @@ public class BaseScrollListener extends RecyclerView.OnScrollListener {
     }
 
     protected int getPastVisibleItems() {
-        RecyclerView.LayoutManager layoutManager = mMoviesScroll.getLayoutManager();
+        RecyclerView.LayoutManager layoutManager = mMoviesView.getLayoutManager();
         return getPastVisibleItems(layoutManager);
     }
 

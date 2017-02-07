@@ -50,6 +50,8 @@ public class MoviesPresenter extends BaseMoviesPresenter {
 
         mMoviesView.setLoading(true);
 
+        mMoviesView.clearMovies();
+
         if (TextUtils.isEmpty(getMovieImagesBaseUrl())) return;
 
         loadMoreMoviesInPage(1);
