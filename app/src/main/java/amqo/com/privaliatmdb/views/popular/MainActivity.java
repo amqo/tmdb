@@ -17,6 +17,7 @@ import amqo.com.privaliatmdb.R;
 import amqo.com.privaliatmdb.views.search.SearchMoviesActivity;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
 
 public class MainActivity extends AppCompatActivity {
@@ -86,15 +87,12 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @OnClick(R.id.fab)
+    public void onToolbarFabClick() {
+        goToSearchActivity();
+    }
+
     private void initViews() {
-
-        mToolbarFAB.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                goToSearchActivity();
-
-            }
-        });
 
         mAppBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             @Override
