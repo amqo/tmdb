@@ -7,6 +7,7 @@ import amqo.com.privaliatmdb.injection.scopes.PerFragment;
 import amqo.com.privaliatmdb.model.contracts.MoviesAdapter;
 import amqo.com.privaliatmdb.model.contracts.MoviesContract;
 import amqo.com.privaliatmdb.network.MoviesEndpoint;
+import amqo.com.privaliatmdb.views.BaseMoviesFragment;
 import amqo.com.privaliatmdb.views.MoviesRecyclerViewAdapter;
 import amqo.com.privaliatmdb.views.search.SearchMoviesFragment;
 import amqo.com.privaliatmdb.views.search.SearchMoviesPresenter;
@@ -18,8 +19,8 @@ public class SearchMoviesModule {
 
     private SearchMoviesFragment mMoviesFragment;
 
-    public SearchMoviesModule(SearchMoviesFragment fragment) {
-        mMoviesFragment = fragment;
+    public SearchMoviesModule(BaseMoviesFragment fragment) {
+        mMoviesFragment = (SearchMoviesFragment) fragment;
     }
 
     @Provides @PerFragment

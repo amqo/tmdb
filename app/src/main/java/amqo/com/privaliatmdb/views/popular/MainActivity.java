@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
             transaction.commit();
         }
 
-        MoviesApplication.getInstance().createMoviesComponent(moviesFragment);
+        MoviesApplication.getInstance().createActiveComponent(moviesFragment);
 
         initViews();
     }
@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         mUnbinder.unbind();
-        MoviesApplication.getInstance().releaseMoviesComponent();
+        MoviesApplication.getInstance().releaseActiveComponent();
     }
 
     @Override

@@ -40,7 +40,7 @@ public class SearchMoviesActivity extends AppCompatActivity {
             transaction.commit();
         }
 
-        MoviesApplication.getInstance().createSearchMoviesComponent(moviesFragment);
+        MoviesApplication.getInstance().createActiveComponent(moviesFragment);
     }
 
     @Override
@@ -55,7 +55,7 @@ public class SearchMoviesActivity extends AppCompatActivity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if(keyCode == KeyEvent.KEYCODE_BACK) {
-            MoviesApplication.getInstance().releaseSearchMoviesComponent();
+            MoviesApplication.getInstance().releaseActiveComponent();
             return true;
         } else return super.onKeyDown(keyCode, event);
     }
@@ -64,7 +64,7 @@ public class SearchMoviesActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         mUnbinder.unbind();
-        MoviesApplication.getInstance().releaseSearchMoviesComponent();
+        MoviesApplication.getInstance().releaseActiveComponent();
     }
 
 }

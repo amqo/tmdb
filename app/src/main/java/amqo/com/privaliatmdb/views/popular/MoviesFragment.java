@@ -35,7 +35,7 @@ public class MoviesFragment extends BaseMoviesFragment {
 
         super.bindViews(view);
 
-        MoviesApplication.getInstance().getMoviesComponent().inject(this);
+        MoviesApplication.getInstance().getActiveComponent().inject(this);
 
         mUpFAB = (FloatingActionButton) view.findViewById(R.id.up_fab);
         mFabUpView.setUpFab(mUpFAB);

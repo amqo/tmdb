@@ -58,7 +58,7 @@ public class SearchMoviesFragment extends BaseMoviesFragment {
 
         super.bindViews(view);
 
-        MoviesApplication.getInstance().getSearchMoviesComponent().inject(this);
+        MoviesApplication.getInstance().getActiveComponent().inject(this);
 
         mRecyclerView.addOnScrollListener(mScrollListener);
 
